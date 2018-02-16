@@ -38,7 +38,7 @@ public class DBApp {
     			if(strClusteringKeyColumn.equals(column))
     				key=true;
     			if(IndexedColumns.contains(column))
-    				indexed=false;
+    				indexed=true;
     			//there is no indexed columns for now
     			writer.append(strTableName+","+column+","+htblColNameType.get(column)+","+key+","+indexed+'\n');
     		}
