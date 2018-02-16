@@ -50,7 +50,7 @@ public class DBApp {
     	Object[] values= new Object[htblColNameValue.size()];
     	int i=0;
 		for(String column: columns){
-			if(table.checkValueType(htblColNameValue.get(column), htblColNameType.get(column)))
+			if(!table.checkValueType(htblColNameValue.get(column), htblColNameType.get(column)))
 				throw new DBAppException("that is not the type of the column");
 			values[i]= htblColNameValue.get(column);
 			i++;
