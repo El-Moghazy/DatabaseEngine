@@ -39,12 +39,12 @@ public class Table {
     
     public boolean checkValueType (Object value, String type) {
     		switch (type) {
-    			case "Integer"	: if (!(value instanceof Integer)) return false;
-    			case "String"	: if (!(value instanceof String)) return false;
-    			case "Double"	: if (!(value instanceof Double)) return false;
-    			case "Boolean"	: if (!(value instanceof Boolean)) return false;
-    			case "Date"		: if (!(value instanceof Date)) return false;
-    			default			: return true;
+    			case "java.lang.Integer": if (!(value instanceof Integer)) return false;
+    			case "java.lang.String"	: if (!(value instanceof String)) return false;
+    			case "java.lang.Double"	: if (!(value instanceof Double)) return false;
+    			case "java.lang.Boolean": if (!(value instanceof Boolean)) return false;
+    			case "java.util.Date"	: if (!(value instanceof Date)) return false;
+    			default					: return true;
     		}
     }
 
