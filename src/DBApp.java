@@ -1,10 +1,14 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
+
 
 public class DBApp {
 	
@@ -31,7 +35,7 @@ public class DBApp {
     public void createTable(String strTableName, String strClusteringKeyColumn, 
     		Hashtable<String,String> htblColNameType ) throws DBAppException, IOException {
     	
-    		Table table = new Table(strTableName, dbPath, htblColNameType, maxPageSize);
+    		Table table = new Table(strTableName, dbPath, htblColNameType, strClusteringKeyColumn, maxPageSize);
     		tables.put(strTableName, table);
     		this.htblColNameType=htblColNameType;
     		Set<String> columns = htblColNameType.keySet();
@@ -47,8 +51,8 @@ public class DBApp {
     			writer.append(strTableName+","+column+","+htblColNameType.get(column)+","+key+","+indexed+'\n');
     		}
     }
-    public void insertIntoTable(String strTableName,Hashtable<String,Object> htblColNameValue)throws DBAppException, IOException
-    {
+    public void insertIntoTable(String strTableName,Hashtable<String,Object> htblColNameValue)throws DBAppException, IOException, ClassNotFoundException
+    {/*
     	Set<String> columns = htblColNameValue.keySet();
     	Object[] values= new Object[htblColNameValue.size()];
     	Table table = tables.get(strTableName);
@@ -59,10 +63,26 @@ public class DBApp {
 			values[i]= htblColNameValue.get(column);
 			i++;
 		}
-		table.insert(new Tuple(values));
+		table.insertTuple(new Tuple(values));
+		*/
+    	Table table = getTable(strTableName);
+    	if(table == null)
+    		throw new DBAppException("Table : "+strTableName+" does not exist");
+    	if(!table.insert(htblColNameValue))
+    		throw new DBAppException("Insertion in table : "+strTableName+" failed");
 		
     }
-    
+    private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
+    	
+    	File file = new File(dbPath+strTableName+"/"+strTableName+".class");
+    	if(file.exists()){
+    		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        	Table table = (Table)ois.readObject();
+        	ois.close();
+        	return table;
+    	}
+    	return null;
+    }
 }
 
 class DBAppException extends Exception {
