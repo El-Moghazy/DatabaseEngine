@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 
 
@@ -13,6 +14,8 @@ public class DBApp {
 	private Hashtable<String,String> htblColNameType ;
 	private HashMap<String,Table> tables = new HashMap<>();
 	private Writer writer;
+	
+	
 	private File metadata;
 	private Properties properties;
 	private Integer MaxRowsPerPage;
@@ -51,6 +54,7 @@ public class DBApp {
 
 		Table table = new Table(strTableName, dbPath, htblColNameType, strClusteringKeyColumn, MaxRowsPerPage);
 		tables.put(strTableName, table);
+		
 		this.htblColNameType = htblColNameType;
 		Set<String> columns = htblColNameType.keySet();
 
@@ -62,6 +66,8 @@ public class DBApp {
 			if(IndexedColumns.contains(column))
 				indexed = true;
 			//there is no indexed columns for now
+			
+			//TODO: Fix this ERROR !!
 			writer.append(strTableName + "," + column + "," + htblColNameType.get(column) + "," + key + "," + indexed + '\n');
 		}
 	}
