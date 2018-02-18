@@ -1,30 +1,27 @@
 import java.io.Serializable;
 
-
-public class Tuple implements Serializable{
+public class Tuple implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Object[] values;
 
-	public Tuple (Object[] values) {
+	public Tuple(Object[] values) {
 		this.values = values;
 	}
 
 	public String toString() {
 		String result = "";
-		for(Object o : values)
+		for (Object o : values)
 			result += o.toString() + ", ";
 		return result;
 	}
 
-	public void add (int index, Object value) {
+	public void add(int index, Object value) {
 		values[index] = value;
 	}
 
-	public Object[] get () {
-		return  values;
+	public Object[] get() {
+		return values;
 	}
-
-
 
 }

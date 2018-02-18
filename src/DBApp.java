@@ -1,8 +1,15 @@
-import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
-
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Set;
 
 public class DBApp {
 
@@ -10,26 +17,24 @@ public class DBApp {
 	private String name, dbPath;
 
 	// TODO: Review below attributes.
-	private static HashSet<String> IndexedColumns= new HashSet<>(); // add all indexed columns here
-	private Hashtable<String,String> htblColNameType ;
-	private HashMap<String,Table> tables = new HashMap<>();
-	private Writer writer;
-	
-	
+	private static HashSet<String> IndexedColumns = new HashSet<>(); // add all indexed columns here
+	private Hashtable<String, String> htblColNameType;
+	private HashMap<String, Table> tables = new HashMap<>();
+	private FileWriter writer;
+
 	private File metadata;
 	private Properties properties;
 	private Integer MaxRowsPerPage;
 
+	public DBApp(String name, Integer MaxRowsPerPage) throws IOException {
 
-	public DBApp (String name, Integer MaxRowsPerPage) throws IOException {
-		
 		this.name = name;
 		this.dbPath = defaultPath + this.name + '/';
 		this.MaxRowsPerPage = MaxRowsPerPage;
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
-		
-		// config file
+
+		// Configuration file
 		properties = new Properties();
 		properties.put("MaxRowsPerPage", MaxRowsPerPage.toString());
 		new File(dbPath + "/config").mkdirs();
@@ -39,7 +44,7 @@ public class DBApp {
 		properties.store(fos, "DB Properties");
 		fos.close();
 
-		// metadata file
+		// Meta data file
 		File data = new File(dbPath + "data/");
 		data.mkdirs();
 
@@ -48,44 +53,54 @@ public class DBApp {
 
 	}
 
-
-	public void createTable (String strTableName, String strClusteringKeyColumn, 
-			Hashtable<String,String> htblColNameType ) throws DBAppException, IOException {
+	public void createTable(String strTableName, String strClusteringKeyColumn,
+			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
 
 		Table table = new Table(strTableName, dbPath, htblColNameType, strClusteringKeyColumn, MaxRowsPerPage);
 		tables.put(strTableName, table);
-		
+
 		this.htblColNameType = htblColNameType;
 		Set<String> columns = htblColNameType.keySet();
 
-		for(String column: columns){
+		for (String column : columns) {
 			boolean key = false;
 			boolean indexed = false;
-			if(strClusteringKeyColumn.equals(column))
+			if (strClusteringKeyColumn.equals(column))
 				key = true;
-			if(IndexedColumns.contains(column))
+			if (IndexedColumns.contains(column))
 				indexed = true;
-			//there is no indexed columns for now
+
+
+			WriteMetaData(strTableName,column,htblColNameType.get(column),key,indexed);
+
 			
-			//TODO: Fix this ERROR !!
-			writer.append(strTableName + "," + column + "," + htblColNameType.get(column) + "," + key + "," + indexed + '\n');
 		}
 	}
-	
 
-	public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue)
-					throws DBAppException, IOException, ClassNotFoundException {
-		Table table = getTable(strTableName);
-		if(table == null)
-			throw new DBAppException("Table: (" + strTableName + ") does not exist");
-		if(!table.insert(htblColNameValue))
-			throw new DBAppException("Insertion in table: (" + strTableName + ") failed");
+	private void WriteMetaData(String strTableName, String column, String string, boolean key, boolean indexed) throws IOException {
+		// TODO Auto-generated method stub
+		
+		writer = new FileWriter(metadata,true);
+		writer.append(
+				strTableName + "," + column + "," + htblColNameType.get(column) + "," + key + "," + indexed + '\n');
+		
+		writer.flush();
+		writer.close();
 	}
-	
+
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, IOException, ClassNotFoundException {
+		Table table = getTable(strTableName);
+		if (table == null)
+			throw new DBAppException("Table: (" + strTableName + ") does not exist");
+		if (!table.insert(htblColNameValue))
+			throw new DBAppException("Insertion in table: (" + strTableName + ")failed");
+	}
+
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
 
 		File file = new File(dbPath + strTableName + "/" + strTableName + ".class");
-		if(file.exists()){
+		if (file.exists()) {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
 			Table table = (Table) ois.readObject();
 			ois.close();
@@ -93,16 +108,5 @@ public class DBApp {
 		}
 		return null;
 	}
-
-}
-
-class DBAppException extends Exception {
-
-	/**
-	 * Any errors related to the DB App can be detected using this exceptions
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public DBAppException(String string) { super(string); }
 
 }

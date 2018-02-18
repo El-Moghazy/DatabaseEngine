@@ -2,30 +2,30 @@ import java.io.File;
 
 public class FileManager {
 
-    static boolean createFolder(String name,String path) {
+	static boolean createFolder(String name, String path) {
 
-        try {
+		try {
 
-            File file = new File(path + name);
-            if (!file.exists()) {
-                if (file.mkdir()) {
-                    System.out.println("Directory is created!");
+			File file = new File(path + name);
+			if (!file.exists()) {
+				if (file.mkdir()) {
+					System.out.println("Directory is created!");
 
-                } else {
-                    System.out.println("Failed to create directory!");
-                }
-            }
+				} else {
+					System.out.println("Failed to create directory!");
+				}
+			}
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 
-        }
-        return false;
-    }
+		}
+		return false;
+	}
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        createFolder("db", "");
+		createFolder("db", "");
 
-    }
+	}
 
 }
