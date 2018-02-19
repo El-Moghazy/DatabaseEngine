@@ -11,8 +11,13 @@ public class Tuple implements Serializable {
 
 	public String toString() {
 		String result = "";
-		for (Object o : values)
-			result += o.toString() + ", ";
+		for (Object o : values) {
+			if (o != values[(values.length - 1)]) {
+				result += o.toString() + ", ";
+			} else {
+				result += o.toString();
+			}
+		}
 		return result;
 	}
 

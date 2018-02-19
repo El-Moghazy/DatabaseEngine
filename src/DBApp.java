@@ -73,7 +73,6 @@ public class DBApp {
 
 			WriteMetaData(strTableName,column,htblColNameType.get(column),key,indexed);
 
-			
 		}
 	}
 

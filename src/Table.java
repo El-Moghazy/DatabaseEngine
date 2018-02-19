@@ -1,7 +1,10 @@
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -18,8 +21,6 @@ public class Table implements Serializable {
 	private String tableName, path, strClusteringKeyColumn;
 	private int curPageIndex, maxPageSize, numOfCols;
 
-	// private Page curPage;
-
 	public Table(String tableName, String path, Hashtable<String, String> htblColNameType,
 			String strClusteringKeyColumn, int maxPageSize) throws DBAppException, IOException {
 
@@ -34,6 +35,7 @@ public class Table implements Serializable {
 		createTableDirectory();
 		createPage();
 		saveTable();
+
 	}
 
 	public boolean insert(Hashtable<String, Object> htblColNameValue)
@@ -63,6 +65,7 @@ public class Table implements Serializable {
 		File file = new File(path + tableName + "_" + curPageIndex + ".class");
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
 		Page curPage = (Page) ois.readObject();
+
 		if (curPage.isFull())
 			curPage = createPage();
 		curPage.insert(tuple);
@@ -81,8 +84,6 @@ public class Table implements Serializable {
 	}
 
 	public boolean checkValueType(Object value, String type) {
-		System.out.println(type);
-		System.out.println(value.getClass().getName());
 
 		switch (type.toLowerCase()) {
 		case "java.lang.integer":

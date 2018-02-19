@@ -43,6 +43,14 @@ public class Page implements Serializable {
 		oos.close();
 	}
 
+	public Tuple[] getTuples() {
+		return tuples;
+	}
+
+	public void setTuples(Tuple[] tuples) {
+		this.tuples = tuples;
+	}
+
 	public int getTupleCount() {
 		return tupleCount;
 	}
