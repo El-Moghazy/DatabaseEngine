@@ -8,6 +8,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -16,17 +17,22 @@ import java.util.Set;
 public class Table implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private ArrayList<String> PrimaryKeyCheck;
+
+	public ArrayList<String> getPrimaryKeyCheck() {
+		return PrimaryKeyCheck;
+	}
 
 	private Hashtable<String, String> htblColNameType;
 	private String tableName, path, strClusteringKeyColumn;
 	private int curPageIndex, maxPageSize, numOfCols;
 
 	public Table(String tableName, String path, Hashtable<String, String> htblColNameType,
-			String strClusteringKeyColumn, int maxPageSize) throws DBAppException, IOException {
-
+			String strClusteringKeyColumn) throws DBAppException, IOException {
+		Configuration config = new Configuration();
+		this.maxPageSize =  config.getMaximumSize();
 		this.tableName = tableName;
 		this.path = path + tableName + '/';
-		this.maxPageSize = maxPageSize;
 		this.htblColNameType = htblColNameType;
 		this.strClusteringKeyColumn = strClusteringKeyColumn;
 		numOfCols = htblColNameType.size();
@@ -54,10 +60,15 @@ public class Table implements Serializable {
 		for (String column : columns)
 			values[i++] = htblColNameValue.get(column);
 
+		PrimaryKeyCheck.add((String) value);
 		insertTuple(new Tuple(values));
 		saveTable();
 		return true;
 
+	}
+
+	public String getStrClusteringKeyColumn() {
+		return strClusteringKeyColumn;
 	}
 
 	public Page insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
@@ -112,7 +123,7 @@ public class Table implements Serializable {
 	}
 
 	private Page createPage() throws IOException {
-		Page page = new Page(path + tableName + "_" + (++curPageIndex) + ".class", maxPageSize);
+		Page page = new Page(path + tableName + "_" + (++curPageIndex) + ".class");
 		saveTable();
 		return page;
 	}

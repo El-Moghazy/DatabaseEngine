@@ -12,9 +12,9 @@ public class Page implements Serializable {
 	private String path;
 	private Tuple[] tuples;
 
-	public Page(String path, int maximumSize) throws IOException {
-
-		this.maximumSize = maximumSize;
+	public Page(String path) throws IOException {
+		Configuration config = new Configuration();
+		this.maximumSize = config.getMaximumSize();
 		this.path = path;
 		tuples = new Tuple[maximumSize];
 

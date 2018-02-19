@@ -5,11 +5,14 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 public class DBApp {
 
@@ -17,7 +20,10 @@ public class DBApp {
 	private String name, dbPath;
 
 	// TODO: Review below attributes.
-	private static HashSet<String> IndexedColumns = new HashSet<>(); // add all indexed columns here
+	private static HashSet<String> IndexedColumns = new HashSet<>(); // add all
+																		// indexed
+																		// columns
+																		// here
 	private Hashtable<String, String> htblColNameType;
 	private HashMap<String, Table> tables = new HashMap<>();
 	private FileWriter writer;
@@ -56,7 +62,7 @@ public class DBApp {
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
 
-		Table table = new Table(strTableName, dbPath, htblColNameType, strClusteringKeyColumn, MaxRowsPerPage);
+		Table table = new Table(strTableName, dbPath, htblColNameType, strClusteringKeyColumn);
 		tables.put(strTableName, table);
 
 		this.htblColNameType = htblColNameType;
@@ -70,19 +76,19 @@ public class DBApp {
 			if (IndexedColumns.contains(column))
 				indexed = true;
 
-
-			WriteMetaData(strTableName,column,htblColNameType.get(column),key,indexed);
+			WriteMetaData(strTableName, column, htblColNameType.get(column), key, indexed);
 
 		}
 	}
 
-	private void WriteMetaData(String strTableName, String column, String string, boolean key, boolean indexed) throws IOException {
+	private void WriteMetaData(String strTableName, String column, String string, boolean key, boolean indexed)
+			throws IOException {
 		// TODO Auto-generated method stub
-		
-		writer = new FileWriter(metadata,true);
+
+		writer = new FileWriter(metadata, true);
 		writer.append(
 				strTableName + "," + column + "," + htblColNameType.get(column) + "," + key + "," + indexed + '\n');
-		
+
 		writer.flush();
 		writer.close();
 	}
@@ -90,6 +96,15 @@ public class DBApp {
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, IOException, ClassNotFoundException {
 		Table table = getTable(strTableName);
+
+		Enumeration<String> keys = htblColNameValue.keys();
+
+		while (keys.hasMoreElements()) {
+			String param = keys.nextElement();
+			if (table.getPrimaryKeyCheck().contains(param))
+				throw new DBAppException("Insertion in table: (" + strTableName
+						+ ")failed. PrimaryKey value already exsists in the tabe");
+		}
 		if (table == null)
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.insert(htblColNameValue))
