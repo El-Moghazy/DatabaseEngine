@@ -12,6 +12,7 @@ public class DBAppTest {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
 		
+		try {
 		String strTableName = "Student";
 
 		DBApp ourDB = new DBApp(strTableName);
@@ -28,12 +29,12 @@ public class DBAppTest {
 		htblColNameValue.put("gpa", new Double(0.95));
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
-		htblColNameValue.put("id", new Integer(453455));
+		htblColNameValue.put("id", new Integer(4253455));
 		htblColNameValue.put("name", new String("Ahmed Noor"));
 		htblColNameValue.put("gpa", new Double(0.95));
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
-		htblColNameValue.put("id", new Integer(5674567));
+		htblColNameValue.put("id", new Integer(453455));
 		htblColNameValue.put("name", new String("Dalia Noor"));
 		htblColNameValue.put("gpa", new Double(1.25));
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
@@ -49,6 +50,9 @@ public class DBAppTest {
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
 
+		} catch (Exception e) {
+			System.out.println("ERROR : DuplicatePrimaryKeyValues");
+		}
 		TestSerialization();
 
 	}

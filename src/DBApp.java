@@ -84,21 +84,14 @@ public class DBApp {
 
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, IOException, ClassNotFoundException {
+		
 		Table table = getTable(strTableName);
 		
-		Enumeration<String> keys = htblColNameValue.keys();
-
-		while (keys.hasMoreElements()) {
-			String param = keys.nextElement();
-			if (table.getPrimaryKeyCheck().contains(param))
-				throw new DBAppException("Insertion in table: (" + strTableName
-						+ ")failed. PrimaryKey value already exsists in the tabe");
-		}
 		if (table == null)
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.insert(htblColNameValue))
 			throw new DBAppException("Insertion in table: (" + strTableName + ")failed");
-	}
+		}
 
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
 

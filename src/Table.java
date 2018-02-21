@@ -60,9 +60,12 @@ public class Table implements Serializable {
 			values[i++] = htblColNameValue.get(column);
 		Date d = Calendar.getInstance().getTime();
 		values[numOfCols]=d;
-
-		PrimaryKeyCheck.add(value);
+		if ( PrimaryKeyCheck.contains(value)) {
+			throw new DBAppException("Insertion in table failed. PrimaryKey value already exsists in the tabe");
+		}
+		
 		insertTuple(new Tuple(values));
+		PrimaryKeyCheck.add(value);
 		saveTable();
 		return true;
 
