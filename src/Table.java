@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Calendar;
 
 public class Table implements Serializable {
 
@@ -51,12 +52,14 @@ public class Table implements Serializable {
 		if (value == null)
 			throw new DBAppException("Clustering key is not allowed to be null");
 
-		Object[] values = new Object[numOfCols];
+		Object[] values = new Object[numOfCols+1];
 		Set<String> columns = htblColNameValue.keySet();
 		int i = 0;
 
 		for (String column : columns)
 			values[i++] = htblColNameValue.get(column);
+		Date d = Calendar.getInstance().getTime();
+		values[numOfCols]=d;
 
 		PrimaryKeyCheck.add(value);
 		insertTuple(new Tuple(values));
