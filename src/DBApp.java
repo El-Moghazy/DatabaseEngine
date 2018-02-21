@@ -34,9 +34,10 @@ public class DBApp {
 
 	public DBApp(String name, Integer MaxRowsPerPage) throws IOException {
 
+		Configuration config = new Configuration();
 		this.name = name;
 		this.dbPath = defaultPath + this.name + '/';
-		this.MaxRowsPerPage = MaxRowsPerPage;
+		this.MaxRowsPerPage = config.getMaximumSize();
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
 
