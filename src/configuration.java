@@ -15,7 +15,7 @@ class Configuration {
 		FileInputStream inStream = null;
 
 		try {
-			inStream = new FileInputStream(new File("src/config/DBApp.config"));
+			inStream = new FileInputStream(new File("config/DBApp.config"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
