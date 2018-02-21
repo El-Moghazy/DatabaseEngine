@@ -90,6 +90,7 @@ public class DBApp {
 
 		while (keys.hasMoreElements()) {
 			String param = keys.nextElement();
+			System.out.println(table.getPrimaryKeyCheck());
 			if (table.getPrimaryKeyCheck().contains(param))
 				throw new DBAppException("Insertion in table: (" + strTableName
 						+ ")failed. PrimaryKey value already exsists in the tabe");

@@ -64,6 +64,7 @@ Student,id,java.lang.Integer,true,false
 Student,gpa,java.lang.double,false,false
 Student,name,java.lang.String,false,false
 Student,id,java.lang.Integer,true,false
+<<<<<<< HEAD
 Student,gpa,java.lang.double,false,false
 Student,name,java.lang.String,false,false
 Student,id,java.lang.Integer,true,false
@@ -76,3 +77,5 @@ Student,id,java.lang.Integer,true,false
 Student,gpa,java.lang.double,false,false
 Student,name,java.lang.String,false,false
 Student,id,java.lang.Integer,true,false
+=======
+>>>>>>> 6ef6a2b1e3b3b1fc7a474653bc29f132847e4d88
