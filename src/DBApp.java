@@ -26,6 +26,12 @@ public class DBApp {
 	private Properties properties;
 	private Integer MaxRowsPerPage;
 
+	
+	/**
+	 * @param name 
+	 * @param MaxRowsPerPage
+	 * @throws IOException
+	 */
 	public DBApp(String name, Integer MaxRowsPerPage) throws IOException {
 
 		this.name = name;

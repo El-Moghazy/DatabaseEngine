@@ -9,7 +9,7 @@ import java.util.Hashtable;
 
 public class DBAppTest {
 
-	@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
 
 		String strTableName = "Student";
