@@ -32,7 +32,7 @@ public class DBApp {
 	private Properties properties;
 	private Integer MaxRowsPerPage;
 
-	public DBApp(String name, Integer MaxRowsPerPage) throws IOException {
+	public DBApp(String name ) throws IOException {
 
 		Configuration config = new Configuration();
 		this.name = name;
