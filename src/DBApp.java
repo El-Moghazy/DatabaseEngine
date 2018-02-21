@@ -30,29 +30,14 @@ public class DBApp {
 	private Properties properties;
 	private Integer MaxRowsPerPage;
 
-	
-	/**
-	 * @param name 
-	 * @param MaxRowsPerPage
-	 * @throws IOException
-	 */
-	public DBApp(String name, Integer MaxRowsPerPage) throws IOException {
+	public DBApp(String name ) throws IOException {
 
+		Configuration config = new Configuration();
 		this.name = name;
 		this.dbPath = defaultPath + this.name + '/';
-		this.MaxRowsPerPage = MaxRowsPerPage;
+		this.MaxRowsPerPage = config.getMaximumSize();
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
-
-		// Configuration file
-		properties = new Properties();
-		properties.put("MaxRowsPerPage", MaxRowsPerPage.toString());
-		new File(dbPath + "/config").mkdirs();
-		File config = new File(dbPath + "/config/DBApp.config");
-		config.createNewFile();
-		FileOutputStream fos = new FileOutputStream(config);
-		properties.store(fos, "DB Properties");
-		fos.close();
 
 		// Meta data file
 		File data = new File(dbPath + "data/");
