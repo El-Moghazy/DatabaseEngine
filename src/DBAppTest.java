@@ -14,7 +14,7 @@ public class DBAppTest {
 
 		String strTableName = "Student";
 
-		DBApp ourDB = new DBApp(strTableName, 100);
+		DBApp ourDB = new DBApp(strTableName);
 
 		Hashtable htblColNameType = new Hashtable();
 		htblColNameType.put("id", "java.lang.Integer");

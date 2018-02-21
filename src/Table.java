@@ -17,9 +17,9 @@ import java.util.Set;
 public class Table implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private ArrayList<String> PrimaryKeyCheck;
+	private ArrayList<Object> PrimaryKeyCheck;
 
-	public ArrayList<String> getPrimaryKeyCheck() {
+	public ArrayList<Object> getPrimaryKeyCheck() {
 		return PrimaryKeyCheck;
 	}
 
@@ -30,6 +30,7 @@ public class Table implements Serializable {
 	public Table(String tableName, String path, Hashtable<String, String> htblColNameType,
 			String strClusteringKeyColumn) throws DBAppException, IOException {
 		Configuration config = new Configuration();
+		PrimaryKeyCheck = new ArrayList();
 		this.maxPageSize =  config.getMaximumSize();
 		this.tableName = tableName;
 		this.path = path + tableName + '/';
@@ -60,7 +61,7 @@ public class Table implements Serializable {
 		for (String column : columns)
 			values[i++] = htblColNameValue.get(column);
 
-		PrimaryKeyCheck.add((String) value);
+		PrimaryKeyCheck.add(value);
 		insertTuple(new Tuple(values));
 		saveTable();
 		return true;
