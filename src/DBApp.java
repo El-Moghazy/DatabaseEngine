@@ -1,11 +1,11 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -71,8 +71,19 @@ public class DBApp {
 	}
 
 	private void WriteMetaData(String strTableName, String column, String string, boolean key, boolean indexed)
-			throws IOException {
+			throws IOException, DBAppException {
 		// TODO Auto-generated method stub
+
+		String line;
+		BufferedReader br = new BufferedReader(new FileReader(metadata));
+		while ((line = br.readLine()) != null) {
+
+			if (line.contains(strTableName + "," + column))
+			{
+				throw new DBAppException("Table "+strTableName+" is already exists");
+			}
+
+		}
 
 		writer = new FileWriter(metadata, true);
 		writer.append(
@@ -84,14 +95,14 @@ public class DBApp {
 
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, IOException, ClassNotFoundException {
-		
+
 		Table table = getTable(strTableName);
-		
+
 		if (table == null)
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.insert(htblColNameValue))
 			throw new DBAppException("Insertion in table: (" + strTableName + ")failed");
-		}
+	}
 
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
 

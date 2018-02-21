@@ -50,9 +50,10 @@ public class DBAppTest {
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
 
-		} catch (Exception e) {
-			System.out.println("ERROR : DuplicatePrimaryKeyValues");
+		} catch (DBAppException D) {
+			System.out.println(D.getMessage());
 		}
+		
 		TestSerialization();
 
 	}
