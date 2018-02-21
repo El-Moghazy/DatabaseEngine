@@ -12,8 +12,6 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
-
 public class DBApp {
 
 	private String defaultPath = "databases/";
