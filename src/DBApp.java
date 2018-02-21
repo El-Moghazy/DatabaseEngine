@@ -85,7 +85,7 @@ public class DBApp {
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, IOException, ClassNotFoundException {
 		Table table = getTable(strTableName);
-
+		
 		Enumeration<String> keys = htblColNameValue.keys();
 
 		while (keys.hasMoreElements()) {
