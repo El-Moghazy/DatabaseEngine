@@ -40,16 +40,6 @@ public class DBApp {
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
 
-		// Configuration file
-		properties = new Properties();
-		properties.put("MaxRowsPerPage", MaxRowsPerPage.toString());
-		new File(dbPath + "/config").mkdirs();
-		File config = new File(dbPath + "/config/DBApp.config");
-		config.createNewFile();
-		FileOutputStream fos = new FileOutputStream(config);
-		properties.store(fos, "DB Properties");
-		fos.close();
-
 		// Meta data file
 		File data = new File(dbPath + "data/");
 		data.mkdirs();
