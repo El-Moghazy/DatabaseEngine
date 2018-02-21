@@ -73,6 +73,7 @@ public class DBAppTest {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		input.close();
 	}
 
 }
