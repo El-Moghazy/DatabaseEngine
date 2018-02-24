@@ -70,10 +70,12 @@ public class Table implements Serializable {
 				keyIndex=i;
 			
 			types[i]=htblColNameType.get(column);
-			values[i++] = htblColNameValue.get(column);
+			values[i] = htblColNameValue.get(column);
+			i++;
 		}
 		Date d = Calendar.getInstance().getTime();
 		values[numOfCols]=d;
+		types[numOfCols]="java.util.date";
 		if ( PrimaryKeyCheck.contains(value)) {
 			
 			throw new DBAppException("Insertion in table failed. PrimaryKey value already exsists in the tabe");
@@ -101,9 +103,12 @@ public class Table implements Serializable {
 			if(column.equals(strClusteringKeyColumn))
 				keyIndex=i;
 			types[i]=htblColNameType.get(column);
-			values[i++] = htblColNameValue.get(column);
-		
+			values[i] = htblColNameValue.get(column);
+			i++;
 		}
+		Date d = Calendar.getInstance().getTime();
+		values[numOfCols]=d;
+		types[numOfCols]="java.util.date";
 		
 		deleteTuple(new Tuple(values,types,keyIndex));
 		if(PrimaryKeyCheck.contains(value))
@@ -122,6 +127,7 @@ public class Table implements Serializable {
 			File file = new File(path + tableName + "_" + i + ".class");
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
 			Page curPage = (Page) ois.readObject();
+ 
 			 if(curPage.getTuples().contains((tuple))){
 				 curPage.delete(tuple);
 				 for(;i<curPageIndex;i++){
@@ -130,12 +136,14 @@ public class Table implements Serializable {
 					 Page nxtPage = (Page) ois2.readObject();
 					 if(!nxtPage.isEmpty()){
 						 Tuple t=nxtPage.getTuples().get(0);
-						 nxtPage.delete(t);
+						 System.out.println(t);
 						 curPage.insert(t);
+						 nxtPage.delete(t);
+						
 						 if(nxtPage.isEmpty())
-							nxtFile.delete();
+							nxtFile.delete(); // it does not delete the file for some reason!!!!
 						 else
-							nxtPage=curPage; 
+							curPage=nxtPage; 
 					 }
 					 ois2.close();
 				 }

@@ -33,7 +33,32 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 	public Object[] get() {
 		return values;
 	}
-
+	@Override
+	public boolean equals(Object o){
+		Tuple t = (Tuple) o;
+		boolean equal= true;
+		for(int i=0;i<t.values.length-1;i++){
+			System.out.println(i);
+			switch (types[i].toLowerCase()) {
+			case "java.lang.integer":
+				if(!((Integer)values[i]).equals((Integer)t.values[i]))
+				equal=false;break;
+			case "java.lang.string":
+				if(!((String)values[i]).equals((String)t.values[i]))
+				equal=false;break;
+			case "java.lang.double":
+				if(!((Double)values[i]).equals((Double)t.values[i]))
+				equal=false;break;
+			case "java.lang.boolean":
+				if(!((Boolean)values[i]).equals((Boolean)t.values[i]))
+				equal=false;break;
+			case "java.util.date":
+				if(!((Date)values[i]).equals((Date)t.values[i]))
+				equal=false;break;
+			}
+		}
+			return equal;
+	}
 	@Override
 	public int compareTo(Tuple t) {
 		boolean equal= true;
@@ -43,16 +68,16 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 				if(!((Integer)values[i]).equals((Integer)t.values[i]))
 				equal=false;break;
 			case "java.lang.string":
-				if(!((String)values[i]).equals((String)t.values[i]));
+				if(!((String)values[i]).equals((String)t.values[i]))
 				equal=false;break;
 			case "java.lang.double":
-				if(!((Double)values[i]).equals((Double)t.values[i]));
+				if(!((Double)values[i]).equals((Double)t.values[i]))
 				equal=false;break;
 			case "java.lang.boolean":
-				if(!((Boolean)values[i]).equals((Boolean)t.values[i]));
+				if(!((Boolean)values[i]).equals((Boolean)t.values[i]))
 				equal=false;break;
 			case "java.util.date":
-				if(!((Date)values[i]).equals((Date)t.values[i]));
+				if(!((Date)values[i]).equals((Date)t.values[i]))
 				equal=false;break;
 			}
 		}
@@ -71,5 +96,9 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 			return ((Date)values[key]).compareTo(((Date)t.values[t.key]));
 		}
 		return 0;
+	}
+
+	public Tuple Clone() {
+		return new Tuple(values, types, key);
 	}
 }

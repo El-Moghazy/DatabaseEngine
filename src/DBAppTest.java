@@ -32,7 +32,7 @@ public class DBAppTest {
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
 		htblColNameValue.put("id", new Integer(4253455));
-		htblColNameValue.put("name", new String("Ahmed Noor"));
+		htblColNameValue.put("name", new String("Ahmed Ali"));
 		htblColNameValue.put("gpa", new Double(0.95));
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
@@ -50,9 +50,12 @@ public class DBAppTest {
 		htblColNameValue.put("name", new String("Zaky Noor"));
 		htblColNameValue.put("gpa", new Double(0.88));
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
-		ourDB.deleteFromTable(strTableName, htblColNameValue);
+		//ourDB.deleteFromTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
-
+		htblColNameValue.put("id", new Integer(23498));
+		htblColNameValue.put("name", new String("John Noor"));
+		htblColNameValue.put("gpa", new Double(1.5));
+		ourDB.deleteFromTable(strTableName, htblColNameValue);
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());
 		}

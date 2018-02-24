@@ -115,7 +115,7 @@ public class DBApp {
 		if (table == null)
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.delete(htblColNameValue))
-			throw new DBAppException("Insertion in table: (" + strTableName + ")failed");
+			throw new DBAppException("Deletion in table: (" + strTableName + ")failed");
 	}
 
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
