@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 public class Page implements Serializable {
 
@@ -78,5 +79,55 @@ public class Page implements Serializable {
 
 	public boolean isEmpty() {
 		return tupleCount==0;
+	}
+
+	public boolean exist(Object objKey) {
+		for(Tuple t : tuples){
+			t.get()[t.getKey()].equals(objKey);
+			switch (t.getTypes()[t.getKey()].toLowerCase()) {
+			case "java.lang.integer":
+				if(((Integer)t.get()[t.getKey()]).equals((Integer)objKey))
+					return true;
+			case "java.lang.string":
+				if(((String)t.get()[t.getKey()]).equals((String)objKey))
+					return true;
+			case "java.lang.double":
+				if(((Double)t.get()[t.getKey()]).equals((Double)objKey))
+					return true;
+			case "java.lang.boolean":
+				if(((Boolean)t.get()[t.getKey()]).equals((Boolean)objKey))
+					return true;
+			case "java.util.date":
+				if(((Date)t.get()[t.getKey()]).equals((Date)objKey))
+					return true;
+			}
+			
+		}
+		return false;
+	}
+
+	public Tuple getThisTuple(Object objKey) {
+		for(Tuple t : tuples){
+			t.get()[t.getKey()].equals(objKey);
+			switch (t.getTypes()[t.getKey()].toLowerCase()) {
+			case "java.lang.integer":
+				if(((Integer)t.get()[t.getKey()]).equals((Integer)objKey))
+					return t;
+			case "java.lang.string":
+				if(((String)t.get()[t.getKey()]).equals((String)objKey))
+					return t;
+			case "java.lang.double":
+				if(((Double)t.get()[t.getKey()]).equals((Double)objKey))
+					return t;
+			case "java.lang.boolean":
+				if(((Boolean)t.get()[t.getKey()]).equals((Boolean)objKey))
+					return t;
+			case "java.util.date":
+				if(((Date)t.get()[t.getKey()]).equals((Date)objKey))
+					return t;
+			}
+			
+		}
+		return null;
 	}
 }

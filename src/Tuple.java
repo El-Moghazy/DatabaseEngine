@@ -38,7 +38,6 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 		Tuple t = (Tuple) o;
 		boolean equal= true;
 		for(int i=0;i<t.values.length-1;i++){
-			System.out.println(i);
 			switch (types[i].toLowerCase()) {
 			case "java.lang.integer":
 				if(!((Integer)values[i]).equals((Integer)t.values[i]))
@@ -98,7 +97,13 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 		return 0;
 	}
 
-	public Tuple Clone() {
-		return new Tuple(values, types, key);
+	public String[] getTypes() {
+		return types;
 	}
+
+	public int getKey() {
+		return key;
+	}
+
+	
 }

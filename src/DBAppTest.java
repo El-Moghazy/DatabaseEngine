@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Set;
@@ -12,7 +13,7 @@ import java.util.Set;
 public class DBAppTest {
 	static DBApp ourDB;
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException, ParseException {
 		
 		try {
 		String strTableName = "Student";
@@ -50,12 +51,17 @@ public class DBAppTest {
 		htblColNameValue.put("name", new String("Zaky Noor"));
 		htblColNameValue.put("gpa", new Double(0.88));
 		ourDB.insertIntoTable(strTableName, htblColNameValue);
-		//ourDB.deleteFromTable(strTableName, htblColNameValue);
 		htblColNameValue.clear();
 		htblColNameValue.put("id", new Integer(23498));
 		htblColNameValue.put("name", new String("John Noor"));
 		htblColNameValue.put("gpa", new Double(1.5));
 		ourDB.deleteFromTable(strTableName, htblColNameValue);
+		htblColNameValue.clear();
+		htblColNameValue.put("id", new Integer(78452));
+		htblColNameValue.put("name", new String("3ala2 Noor"));
+		htblColNameValue.put("gpa", new Double(1.08));
+		ourDB.updateTable(strTableName,"78452", htblColNameValue);
+		htblColNameValue.clear();
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());
 		}
@@ -67,7 +73,8 @@ public class DBAppTest {
 	public static void TestSerialization() throws IOException {
 		Set<String> names=ourDB.getTables().keySet();
 		for(String name :names){
-	//		System.out.println(ourDB.getTables().get(name).getCurPageIndex());
+	//	System.out.println(ourDB.getTables().get(name).getCurPageIndex());
+			//this should return the num of pages in table but it returns 0???!!!(should replace 2 in the loop)
 			for(int i=0;i<=2;i++){
 				File table = new File("databases/"+name+"/"+name+"/"+name+"_"+i+".class");
 				System.out.println("databases/"+name+"/"+name+"/"+name+"_"+i+".class");

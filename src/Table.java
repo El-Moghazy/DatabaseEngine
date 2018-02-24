@@ -1,11 +1,15 @@
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -50,10 +54,7 @@ public class Table implements Serializable {
 		saveTable();
 
 	}
-
-	public boolean insert(Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, ClassNotFoundException, IOException {
-
+	private Tuple makeTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		checkInsertedColumns(htblColNameValue);
 
 		Object value = htblColNameValue.get(strClusteringKeyColumn);
@@ -76,48 +77,69 @@ public class Table implements Serializable {
 		Date d = Calendar.getInstance().getTime();
 		values[numOfCols]=d;
 		types[numOfCols]="java.util.date";
-		if ( PrimaryKeyCheck.contains(value)) {
-			
-			throw new DBAppException("Insertion in table failed. PrimaryKey value already exsists in the tabe");
-		}
-		
-		insertTuple(new Tuple(values,types,keyIndex));
+		return new Tuple(values,types,keyIndex);
+	}
+	public boolean insert(Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, ClassNotFoundException, IOException {
+		Tuple t=makeTuple(htblColNameValue);
+		Object value = htblColNameValue.get(strClusteringKeyColumn);
+		if ( PrimaryKeyCheck.contains(value)) 
+			throw new DBAppException("Insertion in table failed. PrimaryKey value already exist in the table");
+		insertTuple(t);
 		PrimaryKeyCheck.add(value);
 		saveTable();
 		return true;
 
 	}
+	
+
 	public boolean delete(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, ClassNotFoundException, IOException {
-		checkInsertedColumns(htblColNameValue);
+		Tuple t=makeTuple(htblColNameValue);
 		Object value = htblColNameValue.get(strClusteringKeyColumn);
-		if (value == null)
-			throw new DBAppException("Clustering key is not allowed to be null");
-
-		Object[] values = new Object[numOfCols+1];
-		String[] types = new String[numOfCols+1];
-		Set<String> columns = htblColNameValue.keySet();
-		int i = 0;
-		int keyIndex=numOfCols;
-		for (String column : columns){
-			if(column.equals(strClusteringKeyColumn))
-				keyIndex=i;
-			types[i]=htblColNameType.get(column);
-			values[i] = htblColNameValue.get(column);
-			i++;
-		}
-		Date d = Calendar.getInstance().getTime();
-		values[numOfCols]=d;
-		types[numOfCols]="java.util.date";
-		
-		deleteTuple(new Tuple(values,types,keyIndex));
+		deleteTuple(t);
 		if(PrimaryKeyCheck.contains(value))
 			PrimaryKeyCheck.remove(value);
 		saveTable();
 		return true;
 	}
+	public boolean update(String strKey, Hashtable<String, Object> htblColNameValue) 
+			throws DBAppException, IOException, ClassNotFoundException, ParseException {
+		Tuple t=makeTuple(htblColNameValue);
+		Object value = htblColNameValue.get(strClusteringKeyColumn);
+		Object oldKey= fromStringToObject(strKey,htblColNameType.get(strClusteringKeyColumn));
+		if (! value.toString().equals(oldKey.toString())) 
+			throw new DBAppException("update in table failed. PrimaryKeys are not the same");
+		updateTuple(oldKey,t);
+		PrimaryKeyCheck.add(value);
+		if(PrimaryKeyCheck.contains(oldKey))
+			PrimaryKeyCheck.remove(oldKey);
+		
+		saveTable();
+		return true;
+	}
+	
 
 	
+
+	private void updateTuple(Object oldKey, Tuple tuple) throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException {
+		for(int i=0;i<=curPageIndex;i++){
+			File file = new File(path + tableName + "_" + i + ".class");
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+			Page curPage = (Page) ois.readObject();
+ 
+			 if(curPage.exist(oldKey)){
+				 Tuple t= curPage.getThisTuple(oldKey);
+				 curPage.delete(t);
+				 curPage.insert(tuple);
+				 ois.close();
+				 return;
+			 }
+			 ois.close();
+		}
+		throw new DBAppException("This key does not exist in the table");
+		
+	}
 
 	public String getStrClusteringKeyColumn() {
 		return strClusteringKeyColumn;
@@ -136,7 +158,6 @@ public class Table implements Serializable {
 					 Page nxtPage = (Page) ois2.readObject();
 					 if(!nxtPage.isEmpty()){
 						 Tuple t=nxtPage.getTuples().get(0);
-						 System.out.println(t);
 						 curPage.insert(t);
 						 nxtPage.delete(t);
 						
@@ -219,6 +240,30 @@ public class Table implements Serializable {
 			return true;
 		}
 	}
+	private Object fromStringToObject(String strKey, String type) throws ParseException, DBAppException {
+		Object key=new Object();
+		try{
+		switch (type.toLowerCase()) {
+		case "java.lang.integer":
+			key=Integer.parseInt(strKey);break;
+		case "java.lang.string":
+			key=strKey;break;
+		case "java.lang.double":
+			key=Double.parseDouble(strKey);break;
+		case "java.lang.boolean":
+			key=Boolean.parseBoolean(strKey);break;
+		case "java.util.date":
+			SimpleDateFormat format = new SimpleDateFormat("EEE MMM DD HH:mm:ss zzz yyyy");
+			key = format.parse(strKey);break;
+		}
+		return key;
+		}
+		catch (Exception e) {
+			throw new DBAppException("this Key have the wrong syntax");
+		}
+	}
+
+	
 
 	private void createTableDirectory() {
 		File table = new File(path);
@@ -239,6 +284,8 @@ public class Table implements Serializable {
 		oos.writeObject(this);
 		oos.close();
 	}
+
+	
 
 	
 

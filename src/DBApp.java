@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -116,6 +117,15 @@ public class DBApp {
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.delete(htblColNameValue))
 			throw new DBAppException("Deletion in table: (" + strTableName + ")failed");
+	}
+	public void updateTable(String strTableName,String strKey, Hashtable<String,Object> htblColNameValue ) 
+			throws DBAppException, FileNotFoundException, ClassNotFoundException, IOException, ParseException{
+		Table table = getTable(strTableName);
+
+		if (table == null)
+			throw new DBAppException("Table: (" + strTableName + ") does not exist");
+		if (!table.update(strKey,htblColNameValue))
+			throw new DBAppException("Update in table: (" + strTableName + ")failed");
 	}
 
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
