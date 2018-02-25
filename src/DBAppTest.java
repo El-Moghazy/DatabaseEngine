@@ -52,17 +52,17 @@ public class DBAppTest {
 			htblColNameValue.put("name", new String("Zaky Noor"));
 			htblColNameValue.put("gpa", new Double(0.88));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			// htblColNameValue.clear();
-			// htblColNameValue.put("id", new Integer(23498));
-			// htblColNameValue.put("name", new String("John Noor"));
-			// htblColNameValue.put("gpa", new Double(1.5));
-			// ourDB.deleteFromTable(strTableName, htblColNameValue);
-			// htblColNameValue.clear();
-			// htblColNameValue.put("id", new Integer(78452));
-			// htblColNameValue.put("name", new String("3ala2 Noor"));
-			// htblColNameValue.put("gpa", new Double(1.08));
-			// ourDB.updateTable(strTableName,"78452", htblColNameValue);
-			// htblColNameValue.clear();
+			 htblColNameValue.clear();
+			 htblColNameValue.put("id", new Integer(23498));
+			 htblColNameValue.put("name", new String("John Noor"));
+			 htblColNameValue.put("gpa", new Double(1.5));
+			 ourDB.deleteFromTable(strTableName, htblColNameValue);
+			 htblColNameValue.clear();
+			 htblColNameValue.put("id", new Integer(78452));
+			 htblColNameValue.put("name", new String("3ala2 Noor"));
+			 htblColNameValue.put("gpa", new Double(1.08));
+			 ourDB.updateTable(strTableName,"78452", htblColNameValue);
+			 htblColNameValue.clear();
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());
 		}

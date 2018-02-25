@@ -157,8 +157,10 @@ public class Table implements Serializable {
 						curPage.insert(t);
 						nxtPage.delete(t);
 
-						if (nxtPage.isEmpty())
+						if (nxtPage.isEmpty()){
 							nxtFile.delete(); // it does not delete the file for some reason!!!!
+							curPageIndex--;
+						}
 						else
 							curPage = nxtPage;
 					}
