@@ -86,19 +86,19 @@ public class Page implements Serializable {
 			t.get()[t.getKey()].equals(objKey);
 			switch (t.getTypes()[t.getKey()].toLowerCase()) {
 			case "java.lang.integer":
-				if(((Integer)t.get()[t.getKey()]).equals((Integer)objKey))
+				if(((Integer)t.get()[t.getKey()]).equals(objKey))
 					return true;
 			case "java.lang.string":
-				if(((String)t.get()[t.getKey()]).equals((String)objKey))
+				if(((String)t.get()[t.getKey()]).equals(objKey))
 					return true;
 			case "java.lang.double":
-				if(((Double)t.get()[t.getKey()]).equals((Double)objKey))
+				if(((Double)t.get()[t.getKey()]).equals(objKey))
 					return true;
 			case "java.lang.boolean":
-				if(((Boolean)t.get()[t.getKey()]).equals((Boolean)objKey))
+				if(((Boolean)t.get()[t.getKey()]).equals(objKey))
 					return true;
 			case "java.util.date":
-				if(((Date)t.get()[t.getKey()]).equals((Date)objKey))
+				if(((Date)t.get()[t.getKey()]).equals(objKey))
 					return true;
 			}
 
@@ -111,19 +111,19 @@ public class Page implements Serializable {
 			t.get()[t.getKey()].equals(objKey);
 			switch (t.getTypes()[t.getKey()].toLowerCase()) {
 			case "java.lang.integer":
-				if(((Integer)t.get()[t.getKey()]).equals((Integer)objKey))
+				if(((Integer)t.get()[t.getKey()]).equals(objKey))
 					return t;
 			case "java.lang.string":
-				if(((String)t.get()[t.getKey()]).equals((String)objKey))
+				if(((String)t.get()[t.getKey()]).equals(objKey))
 					return t;
 			case "java.lang.double":
-				if(((Double)t.get()[t.getKey()]).equals((Double)objKey))
+				if(((Double)t.get()[t.getKey()]).equals(objKey))
 					return t;
 			case "java.lang.boolean":
-				if(((Boolean)t.get()[t.getKey()]).equals((Boolean)objKey))
+				if(((Boolean)t.get()[t.getKey()]).equals(objKey))
 					return t;
 			case "java.util.date":
-				if(((Date)t.get()[t.getKey()]).equals((Date)objKey))
+				if(((Date)t.get()[t.getKey()]).equals(objKey))
 					return t;
 			}
 

@@ -14,6 +14,7 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 		this.key=key;
 	}
 
+	@Override
 	public String toString() {
 		String result = "";
 		for (Object o : values) {
@@ -40,19 +41,19 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 		for(int i=0;i<t.values.length-1;i++){
 			switch (types[i].toLowerCase()) {
 			case "java.lang.integer":
-				if(!((Integer)values[i]).equals((Integer)t.values[i]))
+				if(!((Integer)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.lang.string":
-				if(!((String)values[i]).equals((String)t.values[i]))
+				if(!((String)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.lang.double":
-				if(!((Double)values[i]).equals((Double)t.values[i]))
+				if(!((Double)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.lang.boolean":
-				if(!((Boolean)values[i]).equals((Boolean)t.values[i]))
+				if(!((Boolean)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.util.date":
-				if(!((Date)values[i]).equals((Date)t.values[i]))
+				if(!((Date)values[i]).equals(t.values[i]))
 				equal=false;break;
 			}
 		}
@@ -64,19 +65,19 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 		for(int i=0;i<t.values.length-1;i++){
 			switch (types[i].toLowerCase()) {
 			case "java.lang.integer":
-				if(!((Integer)values[i]).equals((Integer)t.values[i]))
+				if(!((Integer)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.lang.string":
-				if(!((String)values[i]).equals((String)t.values[i]))
+				if(!((String)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.lang.double":
-				if(!((Double)values[i]).equals((Double)t.values[i]))
+				if(!((Double)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.lang.boolean":
-				if(!((Boolean)values[i]).equals((Boolean)t.values[i]))
+				if(!((Boolean)values[i]).equals(t.values[i]))
 				equal=false;break;
 			case "java.util.date":
-				if(!((Date)values[i]).equals((Date)t.values[i]))
+				if(!((Date)values[i]).equals(t.values[i]))
 				equal=false;break;
 			}
 		}
