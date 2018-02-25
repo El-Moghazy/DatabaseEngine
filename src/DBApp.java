@@ -43,6 +43,8 @@ public class DBApp {
 		this.MaxRowsPerPage = config.getMaximumSize();
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
+		
+		int x = 1;
 
 		// Meta data file
 		File data = new File(dbPath + "data/");
