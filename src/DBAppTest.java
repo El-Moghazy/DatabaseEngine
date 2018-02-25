@@ -14,7 +14,7 @@ public class DBAppTest {
 	static DBApp ourDB;
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException, ParseException {
-
+		
 		try {
 		String strTableName = "Student";
 
