@@ -15,7 +15,7 @@ public class DBAppTest {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException, ParseException {
-
+		
 		try {
 			String strTableName = "Student";
 
@@ -32,6 +32,8 @@ public class DBAppTest {
 			htblColNameValue.put("name", new String("Ahmed Noor"));
 			htblColNameValue.put("gpa", new Double(0.95));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
+			
+			ourDB.deleteFromTable(strTableName, htblColNameValue);
 			htblColNameValue.clear();
 			htblColNameValue.put("id", new Integer(4253455));
 			htblColNameValue.put("name", new String("Ahmed Ali"));
@@ -63,6 +65,12 @@ public class DBAppTest {
 			 htblColNameValue.put("gpa", new Double(1.08));
 			 ourDB.updateTable(strTableName,"78452", htblColNameValue);
 			 htblColNameValue.clear();
+			 
+				htblColNameValue.put("id", new Integer(4253455));
+				htblColNameValue.put("name", new String("Ahmed Ali"));
+				htblColNameValue.put("gpa", new Double(0.95));
+				ourDB.deleteFromTable(strTableName, htblColNameValue);
+				
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());
 		}

@@ -141,38 +141,52 @@ public class Table implements Serializable {
 	}
 
 	private void deleteTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
-		for (int i = 0; i <= curPageIndex; i++) {
-			File file = new File(path + tableName + "_" + i + ".class");
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-			Page curPage = (Page) ois.readObject();
+        for (int i = 0; i <= curPageIndex; i++) {
+            File file = new File(path + tableName + "_" + i + ".class");
+//            System.out.println(file.exists());
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            ObjectInputStream ois2 = null;
+            Page curPage = (Page) ois.readObject();
 
-			if (curPage.getTuples().contains((tuple))) {
-				curPage.delete(tuple);
-				for (; i < curPageIndex; i++) {
-					File nxtFile = new File(path + tableName + "_" + (i + 1) + ".class");
-					ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(nxtFile));
-					Page nxtPage = (Page) ois2.readObject();
-					if (!nxtPage.isEmpty()) {
-						Tuple t = nxtPage.getTuples().get(0);
-						curPage.insert(t);
-						nxtPage.delete(t);
+            if (curPage.getTuples().contains((tuple))) 
+            {
+            	curPage.delete(tuple);
+            	if (curPage.getTuples().size() == 0) 
+            	{
+            		ois.close();
+                    System.out.println("Delete: "+file.delete());
+                    curPageIndex--;
+                    return;
+                }
+                else
+                {
+                    int j = i + 1;
+                    File file2 = new File(path + tableName + "_" + j + ".class");
+                    while (file2.exists())
+                    {
+                        ois2 = new ObjectInputStream(new FileInputStream(file2));
+                        Page nxtPage = (Page) ois2.readObject();
+                        Tuple tuple1 = nxtPage.getTuples().get(0);
+                        curPage.insert(tuple1);
+                        nxtPage.delete(tuple1);
+//                      deleteTuple(tuple1);
+                        if(nxtPage.getTupleCount()==0)
+                        	file2.delete();
+                        j++;
+                        curPage = nxtPage;
+                        file2 = new File(path + tableName + "_" + j + ".class");
 
-						if (nxtPage.isEmpty()){
-							nxtFile.delete(); // it does not delete the file for some reason!!!!
-							curPageIndex--;
-						}
-						else
-							curPage = nxtPage;
-					}
-					ois2.close();
-				}
-				ois.close();
-				return;
-			}
-			ois.close();
-		}
-		throw new DBAppException("This row does not exist in the table");
-	}
+                    }
+                    if(ois2!=null)
+                    	ois2.close();
+                    ois.close();
+                    return;
+                }
+            }
+            ois.close();
+        }
+        throw new DBAppException("This row does not exist in the table");
+    }
 
 	public Page insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
 
