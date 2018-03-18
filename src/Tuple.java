@@ -4,6 +4,11 @@ import java.util.Date;
 public class Tuple implements Serializable ,Comparable<Tuple>{
 
 	private static final long serialVersionUID = 1L;
+
+	public Object[] getValues() {
+		return values;
+	}
+
 	private Object[] values;
 	private String[] types;
 	private int key;
@@ -13,6 +18,7 @@ public class Tuple implements Serializable ,Comparable<Tuple>{
 		this.types=types;
 		this.key=key;
 	}
+
 
 	@Override
 	public String toString() {
