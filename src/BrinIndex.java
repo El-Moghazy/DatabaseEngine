@@ -15,10 +15,12 @@ public class BrinIndex implements Serializable{
 		this.dataPath=dataPath;
 		indexPath = dataPath+indexkey+'/';
 		this.tableName = tableName;
+
 		createTIndexDirectory();
 		createDenseIndex(indexPath,htblColNameType,indexkey,primarykey);
 		createBrinIndex(indexkey);
 		
+
 	}
 	
 	// 

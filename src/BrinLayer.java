@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class BrinLayer implements Serializable {
+
 	private String indexPath, BrinLayerPath;
 	private String indexkey;
 	private int noPages;

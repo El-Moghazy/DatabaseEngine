@@ -61,7 +61,10 @@ public class DenseLayer implements Serializable {
 		for (int i = 0; i <= pageIndex; i++) 
 		{
 			// Student_0.class
-			String name = dataPath+tableName + "_"+i+".class";
+
+
+			String name = dataPath + tableName + "_"+i+".class";
+
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 			Page page = (Page) ois.readObject();
 			ois.close();
@@ -96,13 +99,16 @@ public class DenseLayer implements Serializable {
 		for (int i = 0; i < data.size(); i++)
 		{
 			if(curPage.isFull())
+			{
 				curPage = createPage();
+			}
 			curPage.insert(data.get(i), true);
 		}
 		
 	}
 	 
     private Page createPage() throws IOException {
+
     	Page page = new Page(DenseLayerPath+indexkey +  "dense_" + (++noPages) + ".class");
     	saveindex();
         return page;
