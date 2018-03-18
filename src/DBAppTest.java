@@ -26,6 +26,8 @@ public class DBAppTest {
 			htblColNameType.put("name", "java.lang.String");
 			htblColNameType.put("gpa", "java.lang.double");
 			ourDB.createTable(strTableName, "id", htblColNameType);
+			ourDB.createBRINIndex("Student", "id");
+			
 			// createBRINIndex( strTableName, "gpa" );
 			Hashtable htblColNameValue = new Hashtable();
 			htblColNameValue.put("id", new Integer(2343432));
@@ -65,11 +67,14 @@ public class DBAppTest {
 			 htblColNameValue.put("gpa", new Double(1.08));
 			 ourDB.updateTable(strTableName,"78452", htblColNameValue);
 			 htblColNameValue.clear();
+			 
+			 ourDB.createBRINIndex("Student", "name");
 
-				htblColNameValue.put("id", new Integer(4253455));
-				htblColNameValue.put("name", new String("Ahmed Ali"));
-				htblColNameValue.put("gpa", new Double(0.95));
-				ourDB.deleteFromTable(strTableName, htblColNameValue);
+			htblColNameValue.put("id", new Integer(4253455));
+			htblColNameValue.put("name", new String("Ahmed Ali"));
+			htblColNameValue.put("gpa", new Double(0.95));
+			ourDB.deleteFromTable(strTableName, htblColNameValue);
+			
 
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());

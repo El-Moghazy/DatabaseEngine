@@ -26,13 +26,14 @@ public class Page implements Serializable {
 	}
 
 	// TODO:
-	public boolean insert(Tuple tuple) throws DBAppException, IOException {
+	public boolean insert(Tuple tuple,boolean sort) throws DBAppException, IOException {
 
 		if (isFull()) {
 			return false;
 		}
 		tupleCount++;
 		tuples.add(tuple);
+		if(sort)
 		Collections.sort(tuples);
 		savePage();
 		return true;

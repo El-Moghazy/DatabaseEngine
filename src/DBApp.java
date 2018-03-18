@@ -134,9 +134,11 @@ public class DBApp {
 		return null;
 	}
 	
-	public void createBRINIndex(String strTableName,String strColName) throws DBAppException
+	public void createBRINIndex(String strTableName,String strColName) throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException 
 	{
 		// TODO Find the table and create respective index
+		Table table = getTable(strTableName);
+		table.createBRINIndex(strColName);
 	}
 
 }

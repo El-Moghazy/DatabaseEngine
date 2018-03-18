@@ -55,10 +55,12 @@ public class Table implements Serializable {
 
         Object[] values = new Object[numOfCols + 1];
         String[] types = new String[numOfCols + 1];
+        String[] names=new String[numOfCols + 1];
         Set<String> columns = htblColNameValue.keySet();
         int i = 0;
         int keyIndex = numOfCols;
         for (String column : columns) {
+            names[i]=column;
             if (column.equals(strClusteringKeyColumn))
                 keyIndex = i;
 
@@ -68,8 +70,9 @@ public class Table implements Serializable {
         }
         Date d = Calendar.getInstance().getTime();
         values[numOfCols] = d;
+        names[numOfCols]= "insert time";
         types[numOfCols] = "java.util.date";
-        return new Tuple(values, types, keyIndex);
+        return new Tuple(values, types, names,keyIndex);
     }
 
     public boolean insert(Hashtable<String, Object> htblColNameValue)
@@ -122,7 +125,7 @@ public class Table implements Serializable {
             if (curPage.exist(oldKey)) {
                 Tuple t = curPage.getThisTuple(oldKey);
                 curPage.delete(t);
-                curPage.insert(tuple);
+                curPage.insert(tuple,true);
                 ois.close();
                 return;
             }
@@ -158,7 +161,7 @@ public class Table implements Serializable {
                         ois2 = new ObjectInputStream(new FileInputStream(file2));
                         Page nxtPage = (Page) ois2.readObject();
                         Tuple tuple1 = nxtPage.getTuples().get(0);
-                        curPage.insert(tuple1);
+                        curPage.insert(tuple1,true);
                         nxtPage.delete(tuple1);
 //                      deleteTuple(tuple1);
                         if (nxtPage.getTupleCount() == 0)
@@ -220,7 +223,7 @@ public class Table implements Serializable {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
             Page curPage = (Page) ois.readObject();
             if (!curPage.isFull()) {
-                curPage.insert(tuple);
+                curPage.insert(tuple,true);
                 ois.close();
                 return curPage;
             } else {
@@ -228,7 +231,7 @@ public class Table implements Serializable {
                     Tuple t = curPage.getTuples().get(curPage.getTupleCount() - 1);
                     curPage.setTupleCount(curPage.getTupleCount() - 1);
                     curPage.getTuples().remove(t);
-                    curPage.insert(tuple);
+                    curPage.insert(tuple,true);
                     ois.close();
                     insertTuple(t);
 
@@ -239,7 +242,7 @@ public class Table implements Serializable {
             ois.close();
         }
         Page curPage = createPage();
-        curPage.insert(tuple);
+        curPage.insert(tuple,true);
         return curPage;
     }
 
@@ -336,7 +339,7 @@ public class Table implements Serializable {
     	return null;
     }
     
-    public void createBRINIndex(String strColName) throws DBAppException, IOException
+    public void createBRINIndex(String strColName) throws DBAppException, IOException, ClassNotFoundException
 	{
     	if(this.htblColNameType.containsKey(strColName))
     		throw new DBAppException("this column does not exist");
@@ -344,7 +347,12 @@ public class Table implements Serializable {
     	htblColNameType.put(strColName, this.htblColNameType.get(strColName));
     	htblColNameType.put(strClusteringKeyColumn, this.htblColNameType.get(strClusteringKeyColumn));
     	
-		new BrinIndex(path, htblColNameType,strColName,strClusteringKeyColumn);
+		new BrinIndex(path, htblColNameType,strColName,strClusteringKeyColumn,tableName);
 	}
+    
+
+	public int getMaxPageSize() {return maxPageSize;}
+    
+    
 
 }

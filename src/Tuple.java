@@ -10,15 +10,25 @@ public class Tuple implements Serializable, Comparable<Tuple> {
     }
 
     private Object[] values;
-    private String[] types;
+    public String[] types,colName;
     private int key;
 
-    public Tuple(Object[] values, String[] types, int key) {
+    public Tuple(Object[] values, String[] types,String[] colName, int key) {
         this.values = values;
         this.types = types;
         this.key = key;
+        this.colName = colName;
     }
-
+    
+    public int getIndex(String s) 
+    {
+    	int ret = 0;
+    	for (int i = 0; i < colName.length; i++) {
+			if(colName[i] != null && colName[i].equals(s))
+				return ret;
+		}
+    	return ret;
+    }
 
     @Override
     public String toString() {
