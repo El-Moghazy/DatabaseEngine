@@ -180,35 +180,37 @@ public class Table implements Serializable {
     }
 
 
-    public ArrayList<Tuple2> firstLayerIndex(String Index_name, int columnIndex) throws IOException, DBAppException, ClassNotFoundException {
-        ArrayList<Tuple2> tuples = new ArrayList<>();
-        ObjectInputStream ois = null;
-        int j = 0;
-        File file = new File(path + tableName + "_" + j + ".class");
-        while (file.exists()) {
-            ois = new ObjectInputStream(new FileInputStream(file));
-            Page page = (Page) ois.readObject();
-            ArrayList<Tuple2> pageTuples = page.getTuples();
-            Tuple2 temp = null;
-            for (Tuple2 t : pageTuples) {
-                ArrayList values = new ArrayList();
-                values.add(t.getValues()[t.getKey()]);
-                values.add(t.getValues()[columnIndex]);
-                values.add(j);
-                temp = new Tuple2(values , 0);
-                tuples.add(t);
-            }
-            j++;
-            file = new File(path + tableName + "_" + j + ".class");
-
-        }
-        if (ois != null)
-            ois.close();
-
-        Collections.sort(tuples);
-        return tuples;
-
-    }
+    // TODO Clear moghazy's Code
+    
+//    public ArrayList<Tuple2> firstLayerIndex(String Index_name, int columnIndex) throws IOException, DBAppException, ClassNotFoundException {
+//        ArrayList<Tuple2> tuples = new ArrayList<>();
+//        ObjectInputStream ois = null;
+//        int j = 0;
+//        File file = new File(path + tableName + "_" + j + ".class");
+//        while (file.exists()) {
+//            ois = new ObjectInputStream(new FileInputStream(file));
+//            Page page = (Page) ois.readObject();
+//            ArrayList<Tuple2> pageTuples = page.getTuples();
+//            Tuple2 temp = null;
+//            for (Tuple2 t : pageTuples) {
+//                ArrayList values = new ArrayList();
+//                values.add(t.getValues()[t.getKey()]);
+//                values.add(t.getValues()[columnIndex]);
+//                values.add(j);
+//                temp = new Tuple2(values , 0);
+//                tuples.add(t);
+//            }
+//            j++;
+//            file = new File(path + tableName + "_" + j + ".class");
+//
+//        }
+//        if (ois != null)
+//            ois.close();
+//
+//        Collections.sort(tuples);
+//        return tuples;
+//
+//    }
 
 
     public Page insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
@@ -320,5 +322,15 @@ public class Table implements Serializable {
         oos.writeObject(this);
         oos.close();
     }
+    
+    public BrinIndex getIndex(String strColName) throws DBAppException
+    {
+    	return null;
+    }
+    
+    public void createBRINIndex(String strColName) throws DBAppException
+	{
+		// TODO Create respective index
+	}
 
 }

@@ -133,5 +133,10 @@ public class DBApp {
 		}
 		return null;
 	}
+	
+	public void createBRINIndex(String strTableName,String strColName) throws DBAppException
+	{
+		// TODO Find the table and create respective index
+	}
 
 }
