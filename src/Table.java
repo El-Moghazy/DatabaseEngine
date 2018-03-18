@@ -323,14 +323,28 @@ public class Table implements Serializable {
         oos.close();
     }
     
-    public BrinIndex getIndex(String strColName) throws DBAppException
+    public BrinIndex getIndex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException 
     {
+    	File file = new File(path+ strColName + ".class");
+		if (file.exists()) {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+			BrinIndex Index = (BrinIndex) ois.readObject();
+			ois.close();
+			return Index;
+		}
+		
     	return null;
     }
     
-    public void createBRINIndex(String strColName) throws DBAppException
+    public void createBRINIndex(String strColName) throws DBAppException, IOException
 	{
-		// TODO Create respective index
+    	if(this.htblColNameType.containsKey(strColName))
+    		throw new DBAppException("this column does not exist");
+    	Hashtable<String, String> htblColNameType = new Hashtable<>();
+    	htblColNameType.put(strColName, this.htblColNameType.get(strColName));
+    	htblColNameType.put(strClusteringKeyColumn, this.htblColNameType.get(strClusteringKeyColumn));
+    	
+		new BrinIndex(path, htblColNameType,strColName,strClusteringKeyColumn);
 	}
 
 }
