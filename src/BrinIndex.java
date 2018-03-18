@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -15,6 +16,7 @@ public class BrinIndex {
 		
 		createDenseIndex(indexPath,htblColNameType,indexkey,primarykey);
 		createBrinIndex();
+		createTIndexDirectory();
 	}
 	
 	// 
@@ -27,5 +29,8 @@ public class BrinIndex {
 	{
 		brinLayer = new BrinLayer(indexPath);
 	}
-	
+	private void createTIndexDirectory() {
+        File brin = new File(indexPath);
+        brin.mkdir();
+    }
 }
