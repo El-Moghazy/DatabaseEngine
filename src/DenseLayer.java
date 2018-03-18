@@ -100,6 +100,7 @@ public class DenseLayer implements Serializable {
 		{
 			if(curPage.isFull())
 			{
+				curPage.savePage();
 				curPage = createPage();
 			}
 			curPage.insert(data.get(i), true);

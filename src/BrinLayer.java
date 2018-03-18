@@ -38,7 +38,7 @@ public class BrinLayer implements Serializable {
 				ois2.close();
 			
 				Page curPage = createPage();
-			for (int i = 0; i <= ddense.noPages; i++) 
+			for (int i = 0; i < ddense.noPages; i++) 
 			{
 				// Student_0.class
 				System.out.println( indexPath+ "DenseLayer"+ '/' + indexkey+"dense" + "_"+i+".class");
@@ -64,8 +64,11 @@ public class BrinLayer implements Serializable {
 				colName[1] = page.getTuples().get(0).colName[0];
 				colName[2] = "page.number";
 				Tuple tuple=new Tuple(values, types, colName, 0);
-				if(curPage.isFull())
+				if(curPage.isFull()){
+					curPage.savePage();
 					curPage = createPage();
+				}
+				
 				curPage.insert(tuple, false);
 			}
 			
@@ -75,7 +78,7 @@ public class BrinLayer implements Serializable {
 		}
 
 	    private Page createPage() throws IOException {
-	    	Page page = new Page(BrinLayerPath+ indexkey +  "dense_" + (++noPages) + ".class");
+	    	Page page = new Page(BrinLayerPath+ indexkey +  "brin_" + (++noPages) + ".class");
 	    	saveindex();
 	        return page;
 	    }
