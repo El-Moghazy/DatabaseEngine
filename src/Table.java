@@ -341,7 +341,7 @@ public class Table implements Serializable {
     
     public void createBRINIndex(String strColName) throws DBAppException, IOException, ClassNotFoundException
 	{
-    	if(this.htblColNameType.containsKey(strColName))
+    	if(!this.htblColNameType.containsKey(strColName))
     		throw new DBAppException("this column does not exist");
     	Hashtable<String, String> htblColNameType = new Hashtable<>();
     	htblColNameType.put(strColName, this.htblColNameType.get(strColName));

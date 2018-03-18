@@ -1,9 +1,10 @@
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Hashtable;
 
 
-public class BrinIndex {
+public class BrinIndex implements Serializable{
 	
 	private String indexPath, dataPath , tableName;
 	private DenseLayer denseLayer;
@@ -14,10 +15,10 @@ public class BrinIndex {
 		this.dataPath=dataPath;
 		indexPath = dataPath+indexkey+'/';
 		this.tableName = tableName;
-		
-		createDenseIndex(indexPath,htblColNameType,indexkey,primarykey);
-		createBrinIndex();
 		createTIndexDirectory();
+		createDenseIndex(indexPath,htblColNameType,indexkey,primarykey);
+		createBrinIndex(indexkey);
+		
 	}
 	
 	// 
@@ -26,9 +27,9 @@ public class BrinIndex {
 		denseLayer=new DenseLayer(indexPath, htblColNameType, indexkey, primarykey,dataPath,tableName);
 	}
 	
-	public void createBrinIndex() throws IOException
+	public void createBrinIndex(String indexkey) throws IOException, ClassNotFoundException, DBAppException
 	{
-		brinLayer = new BrinLayer(indexPath);
+		brinLayer = new BrinLayer(indexPath,indexkey);
 	}
 	private void createTIndexDirectory() {
         File brin = new File(indexPath);
