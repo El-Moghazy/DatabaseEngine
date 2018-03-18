@@ -8,12 +8,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class Table implements Serializable {
 
@@ -33,7 +29,7 @@ public class Table implements Serializable {
     }
 
     public Table(String tableName, String path, Hashtable<String, String> htblColNameType,
-            String strClusteringKeyColumn) throws DBAppException, IOException {
+                 String strClusteringKeyColumn) throws DBAppException, IOException {
         Configuration config = new Configuration();
         PrimaryKeyCheck = new ArrayList();
         this.maxPageSize = config.getMaximumSize();
@@ -148,36 +144,31 @@ public class Table implements Serializable {
             ObjectInputStream ois2 = null;
             Page curPage = (Page) ois.readObject();
 
-            if (curPage.getTuples().contains((tuple)))
-            {
+            if (curPage.getTuples().contains((tuple))) {
                 curPage.delete(tuple);
-                if (curPage.getTuples().size() == 0)
-                {
+                if (curPage.getTuples().size() == 0) {
                     ois.close();
-                    System.out.println("Delete: "+file.delete());
+                    System.out.println("Delete: " + file.delete());
                     curPageIndex--;
                     return;
-                }
-                else
-                {
+                } else {
                     int j = i + 1;
                     File file2 = new File(path + tableName + "_" + j + ".class");
-                    while (file2.exists())
-                    {
+                    while (file2.exists()) {
                         ois2 = new ObjectInputStream(new FileInputStream(file2));
                         Page nxtPage = (Page) ois2.readObject();
                         Tuple tuple1 = nxtPage.getTuples().get(0);
                         curPage.insert(tuple1);
                         nxtPage.delete(tuple1);
 //                      deleteTuple(tuple1);
-                        if(nxtPage.getTupleCount()==0)
+                        if (nxtPage.getTupleCount() == 0)
                             file2.delete();
                         j++;
                         curPage = nxtPage;
                         file2 = new File(path + tableName + "_" + j + ".class");
 
                     }
-                    if(ois2!=null)
+                    if (ois2 != null)
                         ois2.close();
                     ois.close();
                     return;
@@ -187,6 +178,38 @@ public class Table implements Serializable {
         }
         throw new DBAppException("This row does not exist in the table");
     }
+
+
+    public ArrayList<Tuple2> firstLayerIndex(String Index_name, int columnIndex) throws IOException, DBAppException, ClassNotFoundException {
+        ArrayList<Tuple2> tuples = new ArrayList<>();
+        ObjectInputStream ois = null;
+        int j = 0;
+        File file = new File(path + tableName + "_" + j + ".class");
+        while (file.exists()) {
+            ois = new ObjectInputStream(new FileInputStream(file));
+            Page page = (Page) ois.readObject();
+            ArrayList<Tuple2> pageTuples = page.getTuples();
+            Tuple2 temp = null;
+            for (Tuple2 t : pageTuples) {
+                ArrayList values = new ArrayList();
+                values.add(t.getValues()[t.getKey()]);
+                values.add(t.getValues()[columnIndex]);
+                values.add(j);
+                temp = new Tuple2(values , 0);
+                tuples.add(t);
+            }
+            j++;
+            file = new File(path + tableName + "_" + j + ".class");
+
+        }
+        if (ois != null)
+            ois.close();
+
+        Collections.sort(tuples);
+        return tuples;
+
+    }
+
 
     public Page insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
 
@@ -231,23 +254,23 @@ public class Table implements Serializable {
     public boolean checkValueType(Object value, String type) {
 
         switch (type.toLowerCase()) {
-        case "java.lang.integer":
-            if (!(value instanceof Integer))
-                return false;
-        case "java.lang.string":
-            if (!(value instanceof String))
-                return false;
-        case "java.lang.double":
-            if (!(value instanceof Double))
-                return false;
-        case "java.lang.boolean":
-            if (!(value instanceof Boolean))
-                return false;
-        case "java.util.date":
-            if (!(value instanceof Date))
-                return false;
-        default:
-            return true;
+            case "java.lang.integer":
+                if (!(value instanceof Integer))
+                    return false;
+            case "java.lang.string":
+                if (!(value instanceof String))
+                    return false;
+            case "java.lang.double":
+                if (!(value instanceof Double))
+                    return false;
+            case "java.lang.boolean":
+                if (!(value instanceof Boolean))
+                    return false;
+            case "java.util.date":
+                if (!(value instanceof Date))
+                    return false;
+            default:
+                return true;
         }
     }
 
@@ -255,22 +278,22 @@ public class Table implements Serializable {
         Object key = new Object();
         try {
             switch (type.toLowerCase()) {
-            case "java.lang.integer":
-                key = Integer.parseInt(strKey);
-                break;
-            case "java.lang.string":
-                key = strKey;
-                break;
-            case "java.lang.double":
-                key = Double.parseDouble(strKey);
-                break;
-            case "java.lang.boolean":
-                key = Boolean.parseBoolean(strKey);
-                break;
-            case "java.util.date":
-                SimpleDateFormat format = new SimpleDateFormat("EEE MMM DD HH:mm:ss zzz yyyy");
-                key = format.parse(strKey);
-                break;
+                case "java.lang.integer":
+                    key = Integer.parseInt(strKey);
+                    break;
+                case "java.lang.string":
+                    key = strKey;
+                    break;
+                case "java.lang.double":
+                    key = Double.parseDouble(strKey);
+                    break;
+                case "java.lang.boolean":
+                    key = Boolean.parseBoolean(strKey);
+                    break;
+                case "java.util.date":
+                    SimpleDateFormat format = new SimpleDateFormat("EEE MMM DD HH:mm:ss zzz yyyy");
+                    key = format.parse(strKey);
+                    break;
             }
             return key;
         } catch (Exception e) {
