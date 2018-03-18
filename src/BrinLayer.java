@@ -2,8 +2,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-public class BrinLayer {
+public class BrinLayer implements Serializable{
 	private String indexPath, BrinLayerPath;
 	private int noPages;
 	

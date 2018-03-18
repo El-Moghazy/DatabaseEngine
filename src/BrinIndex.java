@@ -15,9 +15,9 @@ public class BrinIndex {
 		indexPath = dataPath+indexkey+'/';
 		this.tableName = tableName;
 		
+		createTIndexDirectory();
 		createDenseIndex(indexPath,htblColNameType,indexkey,primarykey);
 		createBrinIndex();
-		createTIndexDirectory();
 	}
 	
 	// 

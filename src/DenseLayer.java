@@ -5,11 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 
-public class DenseLayer {
+public class DenseLayer implements Serializable {
 	private String primarykey;
 	private String indexkey;
 	private String tableName,dataPath,indexPath, DenseLayerPath;
@@ -60,7 +61,7 @@ public class DenseLayer {
 		for (int i = 0; i <= pageIndex; i++) 
 		{
 			// Student_0.class
-			String name = tableName + "_"+i+".class";
+			String name = dataPath + tableName + "_"+i+".class";
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 			Page page = (Page) ois.readObject();
 			ois.close();
@@ -95,14 +96,16 @@ public class DenseLayer {
 		for (int i = 0; i < data.size(); i++)
 		{
 			if(curPage.isFull())
+			{
 				curPage = createPage();
+			}
 			curPage.insert(data.get(i), true);
 		}
 		
 	}
 	 
     private Page createPage() throws IOException {
-    	Page page = new Page(indexkey +  "dense_" + (++noPages) + ".class");
+    	Page page = new Page(DenseLayerPath + indexkey +  "dense_" + (++noPages) + ".class");
     	saveindex();
         return page;
     }
