@@ -1,11 +1,10 @@
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -30,6 +29,10 @@ public class DBApp {
 	private Properties properties;
 	private Integer MaxRowsPerPage;
 
+	public HashMap<String, Table> getTables() {
+		return tables;
+	}
+
 	public DBApp(String name) throws IOException {
 
 		Configuration config = new Configuration();
@@ -38,6 +41,7 @@ public class DBApp {
 		this.MaxRowsPerPage = config.getMaximumSize();
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
+
 
 		// Meta data file
 		File data = new File(dbPath + "data/");
@@ -50,6 +54,10 @@ public class DBApp {
 
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException, IOException {
+		File db = new File("databases/"+name+"/"+strTableName);
+		if (db.exists()) {
+			throw new DBAppException("Table " + strTableName + " is already exists");
+		}
 
 		Table table = new Table(strTableName, dbPath, htblColNameType, strClusteringKeyColumn);
 		tables.put(strTableName, table);
@@ -74,17 +82,6 @@ public class DBApp {
 			throws IOException, DBAppException {
 		// TODO Auto-generated method stub
 
-		String line;
-		BufferedReader br = new BufferedReader(new FileReader(metadata));
-		while ((line = br.readLine()) != null) {
-
-			if (line.contains(strTableName + "," + column))
-			{
-				throw new DBAppException("Table "+strTableName+" is already exists");
-			}
-
-		}
-
 		writer = new FileWriter(metadata, true);
 		writer.append(
 				strTableName + "," + column + "," + htblColNameType.get(column) + "," + key + "," + indexed + '\n');
@@ -102,6 +99,27 @@ public class DBApp {
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.insert(htblColNameValue))
 			throw new DBAppException("Insertion in table: (" + strTableName + ")failed");
+	}
+
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, FileNotFoundException, ClassNotFoundException, IOException {
+
+		Table table = getTable(strTableName);
+
+		if (table == null)
+			throw new DBAppException("Table: (" + strTableName + ") does not exist");
+		if (!table.delete(htblColNameValue))
+			throw new DBAppException("Deletion in table: (" + strTableName + ")failed");
+	}
+
+	public void updateTable(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, FileNotFoundException, ClassNotFoundException, IOException, ParseException {
+		Table table = getTable(strTableName);
+
+		if (table == null)
+			throw new DBAppException("Table: (" + strTableName + ") does not exist");
+		if (!table.update(strKey, htblColNameValue))
+			throw new DBAppException("Update in table: (" + strTableName + ")failed");
 	}
 
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
