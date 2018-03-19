@@ -8,6 +8,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+
+
 
 public class BrinLayer implements Serializable {
 
@@ -71,7 +74,7 @@ public class BrinLayer implements Serializable {
 				
 				curPage.insert(tuple, false);
 			}
-			
+			curPage.savePage();
 			
 			
 			
@@ -91,5 +94,49 @@ public class BrinLayer implements Serializable {
 	        oos.writeObject(this);
 	        oos.close();
 	    }
+		public int[] search(Object[] objarrValues, String[] strarrOperators) throws FileNotFoundException, IOException, ClassNotFoundException {
+			Object min = objarrValues[0];
+			Object max = objarrValues[1];
+			boolean minEq=false;
+			boolean maxEq=false;
+			switch (strarrOperators[0]) {
+			case ">=":
+				
+				break;
+			case ">":
+				
+				break;
+			case "<=":
+				
+				break;
+			case "<":
+				
+				break;
+			default:
+				break;
+			}
+			switch (strarrOperators[1]) {
+			case ">=":
+				
+				break;
+			case ">":
+				
+				break;
+			case "<=":
+				
+				break;
+			case "<":
+				
+				break;
+			default:
+				break;
+			}
+			for(int i=0;i<noPages;i++){
+				 File dense = new File(BrinLayerPath+ indexkey +  "brin_" + i + ".class");
+				 ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(dense));
+					DenseLayer ddense = (DenseLayer) ois2.readObject();
+			}
+					return null;
+		}
 
 }

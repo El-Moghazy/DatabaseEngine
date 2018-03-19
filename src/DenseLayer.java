@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 public class DenseLayer implements Serializable {
 	private String primarykey;
@@ -123,4 +124,9 @@ public class DenseLayer implements Serializable {
         oos.writeObject(this);
         oos.close();
     }
+
+	public Iterator<Object> search(Object[] objarrValues, String[] strarrOperators, int[] pages) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 
 public class BrinIndex implements Serializable{
@@ -82,5 +83,11 @@ public class BrinIndex implements Serializable{
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(index));
         oos.writeObject(this);
         oos.close();
+	}
+	public Iterator<Object> search(Object[] objarrValues,String[] strarrOperators) throws FileNotFoundException, ClassNotFoundException, IOException{
+		int[]pages=brinLayer.search(objarrValues,strarrOperators);
+		
+		return denseLayer.search(objarrValues,strarrOperators,pages);
+		
 	}
 }
