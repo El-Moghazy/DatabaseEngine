@@ -19,7 +19,7 @@ public class DenseLayer implements Serializable {
 	private Hashtable<String, String> htblColNameType;
 	private Table myTable;
 	int noPages;
-	
+
 	public DenseLayer(String indexPath,Hashtable<String, String> htblColNameType,String indexkey,String primarykey,String dataPath,String tableName) throws IOException, ClassNotFoundException, DBAppException
 	{
 		this.primarykey=primarykey;
@@ -30,7 +30,7 @@ public class DenseLayer implements Serializable {
 		this.tableName = tableName;
 		DenseLayerPath=indexPath+"DenseLayer"+'/';
 		noPages=-1;
-		
+
 		File tableSer = new File(dataPath + tableName + ".class");
 		if (tableSer.exists()) {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tableSer));
@@ -38,29 +38,29 @@ public class DenseLayer implements Serializable {
 			ois.close();
 			this.myTable = table;
 		}
-		
+
 		createTDenseDirectory();
 		load();
 		saveindex();
 	}
-	
-	private void createTDenseDirectory() 
+
+	private void createTDenseDirectory()
 	{
 		File dense = new File(DenseLayerPath);
 		dense.mkdir();
 	}
 
 	/*
-	 *	Loads the data from the table	
+	 *	Loads the data from the table
 	 * 	Sorts the data by the indexed column
 	 * 	Stores the data in the dense layer
-	 * 	
+	 *
 	 * */
 	public void load() throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException
 	{
 		ArrayList<Tuple> data = new ArrayList<Tuple>();
 		int pageIndex = myTable.getCurPageIndex();
-		for (int i = 0; i <= pageIndex; i++) 
+		for (int i = 0; i <= pageIndex; i++)
 		{
 			// Student_0.class
 
@@ -75,28 +75,28 @@ public class DenseLayer implements Serializable {
 				int indexKeyPos = t.getIndex(indexkey) ;
 				int primaryKeyPos = t.getIndex(primarykey);
 				Object[] values = new Object[3];
-				values[0] = t.get()[indexKeyPos]; 
+				values[0] = t.get()[indexKeyPos];
 				values[1] = t.get()[primaryKeyPos];
 				values[2] = i;
-				
+
 				String[] types = new String[3];
 				types[0] = t.getTypes()[indexKeyPos];
 				types[1] = t.getTypes()[primaryKeyPos];
 				types[2] = "java.lang.integer";
-				
+
 				String[] colName = new String[3];
 				colName[0] = t.colName[indexKeyPos];
 				colName[1] = t.colName[primaryKeyPos];
 				colName[2] = "page.number";
-				
+
 				Tuple newTuple = new Tuple(values, types, colName, 0);
-				
+
 				data.add(newTuple);
 			}
 		}
-		
+
 		Collections.sort(data);
-		
+
 		Page curPage = createPage();
 		for (int i = 0; i < data.size(); i++)
 		{
@@ -107,9 +107,9 @@ public class DenseLayer implements Serializable {
 			}
 			curPage.insert(data.get(i), true);
 		}
-		
+
 	}
-	 
+
     private Page createPage() throws IOException {
 
     	Page page = new Page(DenseLayerPath+indexkey +  "dense_" + (++noPages) + ".class");
@@ -133,18 +133,18 @@ public class DenseLayer implements Serializable {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 			Page page = (Page) ois.readObject();
 			for(Tuple t:page.getTuples()){
-				if(compare(t.getValues()[0],min)>=0 && compare(t.getValues()[1],max)<=0){
-					if(!((compare(t.getValues()[0],min)==0 && !minEq )|| (compare(t.getValues()[1],max)==0 && !maxEq)))
+				if(compare(t.getValues()[0],min)>=0 && compare(t.getValues()[0],max)<=0){
+					if(!((compare(t.getValues()[0],min)==0 && !minEq )|| (compare(t.getValues()[0],max)==0 && !maxEq)))
 						tuples.add(t);
 				}
 			}
 			ois.close();
-			
+
 		}
 		Iterator<Tuple> t=tuples.iterator();
 		return t;
 	}
-	
+
 	public int compare(Object x,Object y){
 		switch (y.getClass().getName().toLowerCase()) {
         case "java.lang.integer":
@@ -159,12 +159,12 @@ public class DenseLayer implements Serializable {
             return ((Date) x).compareTo(((Date) y));
     }
     return 0;
-		
+
 	}
 
-	public void delete(Tuple tupleToDelete , int pageNum) throws DBAppException, FileNotFoundException, IOException, ClassNotFoundException		
+	public void delete(Tuple tupleToDelete , int pageNum) throws DBAppException, FileNotFoundException, IOException, ClassNotFoundException
 	{
-		if(pageNum >= noPages)
+		if(pageNum > noPages)
 			throw new DBAppException("Tuple doesn't exist in Dense-Layer index");
 		File file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
 		Page page = null;
@@ -175,7 +175,7 @@ public class DenseLayer implements Serializable {
 		}
 		if(page == null)
 			throw new DBAppException("Tuple doesn't exist in Dense-Layer index");
-		
+
 		int idx = 0;
 		// Loops over all of the tuples in this page
 		while(idx < page.getTupleCount())
@@ -183,7 +183,7 @@ public class DenseLayer implements Serializable {
 			Tuple curTuple = page.getTuples().get(idx++);
 			Object c1 = tupleToDelete.get()[tupleToDelete.getKey()];
 			Object c2 = curTuple.get()[curTuple.getKey()];
-			
+
 			// If the current tuple equals the tuple that we want to delete
 			if(compare(c1, c2)==0)
 			{
@@ -191,7 +191,7 @@ public class DenseLayer implements Serializable {
 				break;
 			}
 		}
-		
+
 		Page prevPage = page;
 		page = loadPage(++pageNum);
 		// Shift all of the next tuples
@@ -201,13 +201,72 @@ public class DenseLayer implements Serializable {
 			prevPage.insert(curTuple, false);
 			page.delete(curTuple);
 			page = loadPage(++pageNum);
-			
+
 		}
-		
+
 		// Save the changes
 		saveindex();
 	}
-	
+
+	public int insert(Tuple t, int pageNum, int pagetable) throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException {
+		int indexKeyPos = t.getIndex(indexkey) ;
+		int primaryKeyPos = t.getIndex(primarykey);
+		Object[] values = new Object[3];
+		values[0] = t.get()[indexKeyPos];
+		values[1] = t.get()[primaryKeyPos];
+		values[2] =pagetable ;
+
+		String[] types = new String[3];
+		types[0] = t.getTypes()[indexKeyPos];
+		types[1] = t.getTypes()[primaryKeyPos];
+		types[2] = "java.lang.integer";
+
+		String[] colName = new String[3];
+		colName[0] = t.colName[indexKeyPos];
+		colName[1] = t.colName[primaryKeyPos];
+		colName[2] = "page.number";
+
+		Tuple newTuple = new Tuple(values, types, colName, 0);
+		if(pageNum > noPages){
+			File file = new File(DenseLayerPath + indexkey+"dense_"+ (pageNum-1) +".class");
+			Page page = null;
+			if (file.exists()) {
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+				page= (Page) ois.readObject();
+				ois.close();
+			}
+				if(page.isFull())
+					page=createPage();
+				page.insert(newTuple, true);
+				saveindex();
+				return noPages-1;
+			}
+			for(int i=pageNum;i<=noPages;i++){
+				File file2 = new File(DenseLayerPath + indexkey+"dense_"+ i +".class");
+				Page curpage = null;
+				if (file2.exists()) {
+					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file2));
+					curpage= (Page) ois.readObject();
+					ois.close();
+				}
+				if(curpage.isFull()){
+					Tuple tmp=curpage.getTuples().get(curpage.getTuples().size()-1);
+					curpage.getTuples().remove(tmp);
+					curpage.insert(newTuple, true);
+					newTuple=tmp;
+				}
+				else{
+					curpage.insert(newTuple, true);
+					break;
+				}
+			}
+			saveindex();
+			return pageNum;
+
+
+	}
+
+
 	public Page loadPage(int pageNum) throws ClassNotFoundException, IOException
 	{
 		File file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
@@ -219,5 +278,5 @@ public class DenseLayer implements Serializable {
 		}
 		return page;
 	}
-	
+
 }

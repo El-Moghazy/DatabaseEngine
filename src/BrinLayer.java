@@ -131,13 +131,13 @@ public class BrinLayer implements Serializable {
 			
 		}
 		
-		public void refresh(int densePageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
+		public void refresh(int densePageNumber,int maxDensePageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
 		{
 			int tuplesPerPage = (new Configuration()).getMaximumSize();
 			int brinPageNumber = densePageNumber /  tuplesPerPage;
 			int tuplePointer = densePageNumber % tuplesPerPage;
 			
-			while(brinPageNumber<noPages)
+			while(densePageNumber<=maxDensePageNumber)
 			{
 				
 				File file = new File(indexPath + indexkey+"index_"+ brinPageNumber +".class");
@@ -147,7 +147,9 @@ public class BrinLayer implements Serializable {
 					brinPage= (Page) ois.readObject();
 					ois.close();
 				}
-				if(brinPage==null)return;
+				if(brinPage==null)
+					brinPage=createPage();
+				
 				
 				file = new File( denseLayerPath+ indexkey+"dense_"+ densePageNumber +".class");
 				Page densePage = null;

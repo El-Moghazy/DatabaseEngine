@@ -108,7 +108,25 @@ public class BrinIndex implements Serializable{
 		int pageNumber = list.get(0);
 		
 		denseLayer.delete(tupleToDelete, pageNumber);
-		brinLayer.refresh(pageNumber);
+		brinLayer.refresh(pageNumber,denseLayer.noPages);
+	}
+
+	public void insertTuple(Tuple t, int pagetable) throws FileNotFoundException, ClassNotFoundException, IOException, DBAppException {
+		fetchBrinLayer();
+		fetchDenseLayer();
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		Object idx = t.get()[t.getIndex(indexColName)];
+		list = brinLayer.search(idx, idx, true, true);
+		int page;
+		if(list.isEmpty())
+			page=denseLayer.noPages;
+		else
+			page=list.get(0);
+		page=denseLayer.insert(t, page,pagetable);
+		brinLayer.refresh(page,denseLayer.noPages);
+		
+		
+		
 	}
 
 }

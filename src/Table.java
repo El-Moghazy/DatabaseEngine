@@ -1,8 +1,11 @@
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -10,6 +13,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+
+import com.sun.javafx.scene.paint.GradientUtils.Point;
 
 public class Table implements Serializable {
 
@@ -23,7 +28,7 @@ public class Table implements Serializable {
 
     private Hashtable<String, String> htblColNameType;
     private String tableName, path, strClusteringKeyColumn;
-    private int curPageIndex, maxPageSize, numOfCols;
+    private int curPageIndex, maxPageSize, numOfCols,pagetmp;
 
     public int getCurPageIndex() {
         return curPageIndex;
@@ -52,6 +57,7 @@ public class Table implements Serializable {
 
         Object value = htblColNameValue.get(strClusteringKeyColumn);
         if (value == null)
+
             throw new DBAppException("Clustering key is not allowed to be null");
 
         Object[] values = new Object[numOfCols + 1];
@@ -82,9 +88,11 @@ public class Table implements Serializable {
         Object value = htblColNameValue.get(strClusteringKeyColumn);
         if (PrimaryKeyCheck.contains(value))
             throw new DBAppException("Insertion in table failed. PrimaryKey value already exist in the table");
-        insertTuple(t);
+       int page= insertTuple(t);
         PrimaryKeyCheck.add(value);
         saveTable();
+        for (BrinIndex index : indexList)
+        	index.insertTuple(t,page);
         return true;
 
     }
@@ -98,9 +106,9 @@ public class Table implements Serializable {
             PrimaryKeyCheck.remove(value);
         saveTable();
         fetchBRINindices();
-        for (BrinIndex index : indexList) 
+        for (BrinIndex index : indexList)
         	index.deleteTuple(t);
-		
+
         return true;
     }
 
@@ -111,16 +119,20 @@ public class Table implements Serializable {
         Object oldKey = fromStringToObject(strKey, htblColNameType.get(strClusteringKeyColumn));
         if (!value.toString().equals(oldKey.toString()))
             throw new DBAppException("update in table failed. PrimaryKeys are not the same");
-        updateTuple(oldKey, t);
+       Tuple old= updateTuple(oldKey, t);
         PrimaryKeyCheck.add(value);
         if (PrimaryKeyCheck.contains(oldKey))
             PrimaryKeyCheck.remove(oldKey);
-
         saveTable();
+        fetchBRINindices();
+        for (BrinIndex index : indexList) {
+        	index.deleteTuple(old);
+        	index.insertTuple(t,pagetmp);
+        }
         return true;
     }
 
-    private void updateTuple(Object oldKey, Tuple tuple)
+    private Tuple updateTuple(Object oldKey, Tuple tuple)
             throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException {
         for (int i = 0; i <= curPageIndex; i++) {
             File file = new File(path + tableName + "_" + i + ".class");
@@ -132,7 +144,9 @@ public class Table implements Serializable {
                 curPage.delete(t);
                 curPage.insert(tuple,true);
                 ois.close();
-                return;
+                  pagetmp = i;
+
+                return t;
             }
             ois.close();
         }
@@ -187,7 +201,7 @@ public class Table implements Serializable {
         throw new DBAppException("This row does not exist in the table");
     }
 
-    public Page insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
+    public int insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
 
         for (int i = 0; i <= curPageIndex; i++) {
             File file = new File(path + tableName + "_" + i + ".class");
@@ -196,7 +210,7 @@ public class Table implements Serializable {
             if (!curPage.isFull()) {
                 curPage.insert(tuple,true);
                 ois.close();
-                return curPage;
+                return i;
             } else {
                 if (tuple.compareTo(curPage.getTuples().get(curPage.getTupleCount() - 1)) < 0) {
                     Tuple t = curPage.getTuples().get(curPage.getTupleCount() - 1);
@@ -206,7 +220,7 @@ public class Table implements Serializable {
                     ois.close();
                     insertTuple(t);
 
-                    return curPage;
+                    return i;
                 }
             }
 
@@ -214,7 +228,7 @@ public class Table implements Serializable {
         }
         Page curPage = createPage();
         curPage.insert(tuple,true);
-        return curPage;
+        return curPageIndex;
     }
 
     private void checkInsertedColumns(Hashtable<String, Object> htblColNameValue) throws DBAppException {
@@ -296,8 +310,8 @@ public class Table implements Serializable {
         oos.writeObject(this);
         oos.close();
     }
-    
-    public BrinIndex getIndex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException 
+
+    public BrinIndex getIndex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File file = new File(path+ strColName + ".class");
 		if (file.exists()) {
@@ -306,10 +320,10 @@ public class Table implements Serializable {
 			ois.close();
 			return Index;
 		}
-		
+
     	return null;
     }
-    
+
     public void createBRINIndex(String strColName) throws DBAppException, IOException, ClassNotFoundException
 	{
     	if(!this.htblColNameType.containsKey(strColName))
@@ -317,13 +331,13 @@ public class Table implements Serializable {
     	Hashtable<String, String> htblColNameType = new Hashtable<>();
     	htblColNameType.put(strColName, this.htblColNameType.get(strColName));
     	htblColNameType.put(strClusteringKeyColumn, this.htblColNameType.get(strClusteringKeyColumn));
-    	
+
 		new BrinIndex(path, htblColNameType,strColName,strClusteringKeyColumn,tableName);
 	}
-    
+
 
 	public int getMaxPageSize() {return maxPageSize;}
-    
+
 	/*
 	 * Returns all of the BRIN indices created on this table
 	 * */
@@ -336,18 +350,18 @@ public class Table implements Serializable {
     		if(folder.isDirectory())
     		{
     			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
-    			if (file.exists()) 
+    			if (file.exists())
     			{
     				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
     				BrinIndex index = (BrinIndex) ois.readObject();
     				ois.close();
     				list.add(index);
-    			}	 
+    			}
     		}
     	}
     	return indexList = list;
     }
-    
+
     public BrinIndex fetchBRINindex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File dir = new File(path);
@@ -356,78 +370,117 @@ public class Table implements Serializable {
     		if(folder.isDirectory())
     		{
     			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
-    			if (file.exists()) 
+    			if (file.exists())
     			{
     				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
     				BrinIndex index = (BrinIndex) ois.readObject();
     				ois.close();
     				return index;
-    			}	 
+    			}
     		}
     	}
     	return null;
     }
-    public Iterator<Tuple> search( String strColumnName, Object[] objarrValues, String[] strarrOperators) throws FileNotFoundException, ClassNotFoundException, IOException{
-    	BrinIndex index = fetchBRINindex(strColumnName);
-    	if(index==null)
-    		return null;
-    		Object  min ;
-    		Object  max ;
-    		switch (htblColNameType.get(strColumnName).toLowerCase())
-            {
-            case "java.lang.integer":
-				min=Integer.MIN_VALUE;
-				max=Integer.MAX_VALUE;
-			case "java.lang.string":
-				min="";
-				max="ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-			case "java.lang.double":
-				min=Double.MIN_VALUE;
-				max=Double.MAX_VALUE;
-			
-			case "java.util.date":
-				min=new Date(Long.MIN_VALUE);
-				max=new Date(Long.MAX_VALUE);
-			default:
-				min=Integer.MIN_VALUE;
-				max=Integer.MAX_VALUE;
-           }
-        
-        boolean mineq=false;
-        boolean maxeq=false;
-        for(int i = 0; i < objarrValues.length;i++)
-        {
-            switch (strarrOperators[i])
-             {
-                case ">=":
-                    min = min(min,objarrValues[i]);  
-                    mineq=true;
-                    break;
-                case ">":
-                     min = min(min,objarrValues[i] );                     
-                    break;
-                case "<=":
-                    max = max(max , objarrValues[i]);
-                    maxeq=true;
-                    break;
-                case "<":
-                    max = max(max , objarrValues[i] );
-                    break;
-                default:
-                    break;
+    public Iterator<Tuple> search(String strColumnName, Object[] objarrValues, String[] strarrOperators)
+            throws FileNotFoundException, ClassNotFoundException, IOException {
+        BrinIndex index = fetchBRINindex(strColumnName);
+
+        Object min;
+        Object max;
+        switch (htblColNameType.get(strColumnName).toLowerCase()) {
+        case "java.lang.integer":
+            min = Integer.MIN_VALUE;
+            max = Integer.MAX_VALUE;
+        case "java.lang.string":
+            min = "";
+            max = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+        case "java.lang.double":
+            min = Double.MIN_VALUE;
+            max = Double.MAX_VALUE;
+
+        case "java.util.date":
+            min = new Date(Long.MIN_VALUE);
+            max = new Date(Long.MAX_VALUE);
+        default:
+            min = Integer.MIN_VALUE;
+            max = Integer.MAX_VALUE;
+        }
+
+        boolean mineq = false;
+        boolean maxeq = false;
+        for (int i = 0; i < objarrValues.length; i++) {
+            switch (strarrOperators[i]) {
+            case ">=":
+                min = min(min, objarrValues[i]);
+                mineq = true;
+                break;
+            case ">":
+                min = min(min, objarrValues[i]);
+                break;
+            case "<=":
+                max = max(max, objarrValues[i]);
+                maxeq = true;
+                break;
+            case "<":
+                max = max(max, objarrValues[i]);
+                break;
+            default:
+                break;
             }
         }
-        Iterator<Tuple> indextuples= index.search(min, max, mineq, maxeq);
-        ArrayList<Tuple>tabletubles=new ArrayList<>();
-        while(indextuples.hasNext()){
-        	Tuple t= indextuples.next();
-        	File file = new File(path + tableName + "_" + ((Integer)t.get()[2]) + ".class");
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-            Page curPage = (Page) ois.readObject();
-            tabletubles.add(curPage.getThisTuple(t.get()[1]));
-            ois.close();
+
+        if (index == null) {
+
+            ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
+
+            for (int i = 0; i <= this.getCurPageIndex(); i++) {
+                File table = new File(
+                        "databases/" + tableName + "/" + tableName + "/" + tableName + "_" + i + ".class");
+                System.out.println("databases/" + tableName + "/" + tableName + "/" + tableName + "_" + i + ".class");
+                InputStream file = new FileInputStream(table);
+                InputStream buffer = new BufferedInputStream(file);
+                ObjectInput input = new ObjectInputStream(buffer);
+                try {
+
+                    Page p = (Page) input.readObject();
+
+                    ArrayList<Tuple> t = p.getTuples();
+
+                    for (Tuple tt : t) {
+                        if (tt != null) {
+                            int myindex = tt.getIndex(strColumnName);
+                            Object o = tt.getValues()[myindex];
+                             if(compare(o,min)>=0 && compare(o,max)<=0){
+                                if(!((compare(o,min)==0 && !mineq )|| (compare(o,max)==0 && !maxeq)))
+                                    tabletubles.add(tt);
+                            }
+
+                        }
+                    }
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                input.close();
+            }
+
+            return tabletubles.iterator();
+
+        } else {
+
+            Iterator<Tuple> indextuples = index.search(min, max, mineq, maxeq);
+            ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
+            while (indextuples.hasNext()) {
+                Tuple t = indextuples.next();
+                File file = new File(path + tableName + "_" + ((Integer) t.get()[2]) + ".class");
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                Page curPage = (Page) ois.readObject();
+                tabletubles.add(curPage.getThisTuple(t.get()[1]));
+                ois.close();
+            }
+            return tabletubles.iterator();
+
         }
-		return tabletubles.iterator();
     }
 
 	private Object max(Object max, Object object) {
@@ -435,10 +488,10 @@ public class Table implements Serializable {
         String type =object.getClass().toString();
 
         if (type.contains("Integer")) {
-            return Math.max((Integer)max,(Integer) object);        
+            return Math.max((Integer)max,(Integer) object);
         } else if (type.contains("Double")) {
         	 return Math.max((Integer)max,(Integer) object);
-            
+
         } else if (type.contains("String")) {
         	if(((String)max).compareTo((String)object)==1)
         		return max;
@@ -451,7 +504,7 @@ public class Table implements Serializable {
     			return object;
 
         }
-    
+
 		return null;
 	}
 
@@ -459,10 +512,10 @@ public class Table implements Serializable {
 		   String type =object.getClass().toString();
 
 	        if (type.contains("Integer")) {
-	            return Math.min((Integer)min,(Integer) object);        
+	            return Math.min((Integer)min,(Integer) object);
 	        } else if (type.contains("Double")) {
 	        	 return Math.min((Integer)min,(Integer) object);
-	            
+
 	        } else if (type.contains("String")) {
 	        	if(((String)min).compareTo((String)object)==-1)
 	        		return min;
@@ -475,25 +528,25 @@ public class Table implements Serializable {
 	    			return object;
 
 	        }
-	    
+
 			return null;
 	}
-	
+
 	private Tuple binarySearch(Object key) throws FileNotFoundException, ClassNotFoundException, IOException
 	{
-		int lo = 0 , hi = curPageIndex , index = -1; 
-		
+		int lo = 0 , hi = curPageIndex , index = -1;
+
 		while(lo <= hi)
 		{
 			int mid = (hi+lo)/2;
 			Page curPage = loadPage(mid);
-			
+
 			Tuple firstTuple = curPage.getTuples().get(0);
 			Tuple lastTuple = curPage.getTuples().get(curPage.getTupleCount());
-			
+
 			Object p1 = firstTuple.get()[firstTuple.getKey()];
 			Object p2 = lastTuple.get()[lastTuple.getKey()];
-			
+
 			if(compare(key, p1)>=0 && compare(key, p2)<=0)
 			{
 				index = mid;
@@ -508,12 +561,12 @@ public class Table implements Serializable {
 				hi = mid-1;
 			}
 		}
-		
+
 		if(index==-1)
 			return null;
 		return loadPage(index).getThisTuple(key);
 	}
-	
+
 	public Page loadPage(int pageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		File file = new File(path + tableName+"_"+ pageNumber +".class");
@@ -525,7 +578,7 @@ public class Table implements Serializable {
 		}
 		return page;
 	}
-	
+
 	public int compare(Object x,Object y){
 		switch (y.getClass().getName().toLowerCase()) {
         case "java.lang.integer":
@@ -540,6 +593,6 @@ public class Table implements Serializable {
             return ((Date) x).compareTo(((Date) y));
     }
     return 0;
-		
+
 	}
 }
