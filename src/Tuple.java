@@ -22,7 +22,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
     
     public int getIndex(String s) 
     {
-    	int ret = 0;
+    	
     	for (int i = 0; i < colName.length; i++) {
 			if(colName[i] != null && colName[i].equals(s))
 				return i;
