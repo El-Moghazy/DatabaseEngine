@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
@@ -140,5 +141,11 @@ public class DBApp {
 		Table table = getTable(strTableName);
 		table.createBRINIndex(strColName);
 	}
-
+	public Iterator<Tuple> selectFromTable(String strTableName, String strColumnName,
+			 Object[] objarrValues,
+			 String[] strarrOperators)
+			throws DBAppException, FileNotFoundException, ClassNotFoundException, IOException {
+				return getTable(strTableName).search(strColumnName, objarrValues, strarrOperators);
+		
+	}
 }
