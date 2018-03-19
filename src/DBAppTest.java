@@ -20,6 +20,9 @@ public class DBAppTest {
 			String strTableName = "Student";
 
 			ourDB = new DBApp(strTableName);
+			
+			
+			
 
 			Hashtable htblColNameType = new Hashtable();
 			htblColNameType.put("id", "java.lang.Integer");
@@ -75,6 +78,11 @@ public class DBAppTest {
 			htblColNameValue.put("gpa", new Double(0.95));
 			ourDB.deleteFromTable(strTableName, htblColNameValue);
 			
+			htblColNameValue = new Hashtable();
+			htblColNameValue.put("id", new Integer(20432));
+			htblColNameValue.put("name", new String("AhmedasadNoor"));
+			htblColNameValue.put("gpa", new Double(0.95));
+			ourDB.insertIntoTable(strTableName, htblColNameValue);
 
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());

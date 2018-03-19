@@ -15,6 +15,7 @@ public class Table implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private ArrayList<Object> PrimaryKeyCheck;
+    private transient ArrayList<BrinIndex> indexList;
 
     public ArrayList<Object> getPrimaryKeyCheck() {
         return PrimaryKeyCheck;
@@ -353,6 +354,28 @@ public class Table implements Serializable {
 
 	public int getMaxPageSize() {return maxPageSize;}
     
-    
+	/*
+	 * Returns all of the BRIN indices created on this table
+	 * */
+    public ArrayList<BrinIndex> fetchBRINindices(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
+    {
+    	File dir = new File(path);
+    	ArrayList<BrinIndex> list = new ArrayList<BrinIndex>();
+    	for(File folder : dir.listFiles())
+    	{
+    		if(folder.isDirectory())
+    		{
+    			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
+    			if (file.exists()) 
+    			{
+    				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+    				BrinIndex index = (BrinIndex) ois.readObject();
+    				ois.close();
+    				list.add(index);
+    			}	 
+    		}
+    	}
+    	return indexList = list;
+    }
 
 }
