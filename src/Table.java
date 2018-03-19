@@ -472,11 +472,7 @@ public class Table implements Serializable {
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
             while (indextuples.hasNext()) {
                 Tuple t = indextuples.next();
-                File file = new File(path + tableName + "_" + ((Integer) t.get()[2]) + ".class");
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-                Page curPage = (Page) ois.readObject();
-                tabletubles.add(curPage.getThisTuple(t.get()[1]));
-                ois.close();
+                tabletubles.add(binarySearch(t.get()[t.getKey()]));  
             }
             return tabletubles.iterator();
 
