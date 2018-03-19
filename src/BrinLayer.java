@@ -139,7 +139,7 @@ public class BrinLayer implements Serializable {
 			int brinPageNumber = densePageNumber /  tuplesPerPage;
 			int tuplePointer = densePageNumber % tuplesPerPage;
 			
-			while(densePageNumber<maxDensePageNumber)
+			while(densePageNumber<=maxDensePageNumber)
 			{
 				
 				File file = new File(indexPath + indexkey+"index_"+ brinPageNumber +".class");
