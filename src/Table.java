@@ -478,4 +478,68 @@ public class Table implements Serializable {
 	    
 			return null;
 	}
+	
+	private Tuple binarySearch(Object key) throws FileNotFoundException, ClassNotFoundException, IOException
+	{
+		int lo = 0 , hi = curPageIndex , index = -1; 
+		
+		while(lo <= hi)
+		{
+			int mid = (hi+lo)/2;
+			Page curPage = loadPage(mid);
+			
+			Tuple firstTuple = curPage.getTuples().get(0);
+			Tuple lastTuple = curPage.getTuples().get(curPage.getTupleCount());
+			
+			Object p1 = firstTuple.get()[firstTuple.getKey()];
+			Object p2 = lastTuple.get()[lastTuple.getKey()];
+			
+			if(compare(key, p1)>=0 && compare(key, p2)<=0)
+			{
+				index = mid;
+				break;
+			}
+			if(compare(key, p2)>0)
+			{
+				lo = mid+1;
+			}
+			else
+			{
+				hi = mid-1;
+			}
+		}
+		
+		if(index==-1)
+			return null;
+		return loadPage(index).getThisTuple(key);
+	}
+	
+	public Page loadPage(int pageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
+	{
+		File file = new File(path + tableName+"_"+ pageNumber +".class");
+		Page page = null;
+		if (file.exists()) {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+			page= (Page) ois.readObject();
+			ois.close();
+		}
+		return page;
+	}
+	
+	public int compare(Object x,Object y){
+		switch (y.getClass().getName().toLowerCase()) {
+        case "java.lang.integer":
+            return ((Integer) x).compareTo(((Integer) y));
+        case "java.lang.string":
+            return ((String) x).compareTo(((String) y));
+        case "java.lang.double":
+            return ((Double) x).compareTo(((Double) y));
+        case "java.lang.boolean":
+            return ((Boolean) x).compareTo(((Boolean) y));
+        case "java.util.date":
+            return ((Date) x).compareTo(((Date) y));
+    }
+    return 0;
+		
+	}
 }

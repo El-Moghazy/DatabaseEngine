@@ -164,7 +164,7 @@ public class DenseLayer implements Serializable {
 
 	public void delete(Tuple tupleToDelete , int pageNum) throws DBAppException, FileNotFoundException, IOException, ClassNotFoundException		
 	{
-		if(pageNum <= noPages)
+		if(pageNum >= noPages)
 			throw new DBAppException("Tuple doesn't exist in Dense-Layer index");
 		File file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
 		Page page = null;
@@ -187,40 +187,37 @@ public class DenseLayer implements Serializable {
 			// If the current tuple equals the tuple that we want to delete
 			if(compare(c1, c2)==0)
 			{
+				page.delete(curTuple);
 				break;
 			}
 		}
 		
+		Page prevPage = page;
+		page = loadPage(++pageNum);
 		// Shift all of the next tuples
-		while(true)
+		while(page!=null)
 		{
+			Tuple curTuple = page.getTuples().get(0);
+			prevPage.insert(curTuple, false);
+			page.delete(curTuple);
+			page = loadPage(++pageNum);
 			
-			// If we reached the end of this page
-			if(idx >= page.getTupleCount() )
-			{
-				// Try to load the next page
-				if(++pageNum >= noPages)
-					break;
-				file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
-				Page tempPage = page;
-				page = null;
-				if (file.exists()) {
-					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-					page= (Page) ois.readObject();
-					ois.close();
-				}
-				if(page == null)
-					break;
-				
-				tempPage.getTuples().set(tempPage.getTupleCount()-1, page.getTuples().get(0));
-				continue;
-			}
-			page.getTuples().set(idx, page.getTuples().get(idx-1));
-			idx++;
 		}
 		
 		// Save the changes
 		saveindex();
+	}
+	
+	public Page loadPage(int pageNum) throws ClassNotFoundException, IOException
+	{
+		File file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
+		Page page = null;
+		if (file.exists()) {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+			page= (Page) ois.readObject();
+			ois.close();
+		}
+		return page;
 	}
 	
 }
