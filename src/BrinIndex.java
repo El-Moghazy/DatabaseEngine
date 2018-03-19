@@ -91,4 +91,24 @@ public class BrinIndex implements Serializable{
 		return denseLayer.search(min,max,minEq,maxEq,pages);
 		
 	}
+
+	public void deleteTuple(Tuple tupleToDelete) throws FileNotFoundException, ClassNotFoundException, IOException, DBAppException
+	{
+		fetchBrinLayer();
+		fetchDenseLayer();
+		// Read page number from brin layer
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		Object idx = tupleToDelete.get()[tupleToDelete.getIndex(indexColName)];
+		list = brinLayer.search(idx, idx, true, true);
+		if(list.isEmpty())
+		{
+			System.err.println("Delete-trace: Tuple doesn't exist in index");
+			return;
+		}
+		int pageNumber = list.get(0);
+		
+		denseLayer.delete(tupleToDelete, pageNumber);
+		brinLayer.refresh(pageNumber);
+	}
+
 }

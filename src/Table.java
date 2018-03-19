@@ -52,6 +52,7 @@ public class Table implements Serializable {
 
         Object value = htblColNameValue.get(strClusteringKeyColumn);
         if (value == null)
+        	
             throw new DBAppException("Clustering key is not allowed to be null");
 
         Object[] values = new Object[numOfCols + 1];
@@ -97,6 +98,10 @@ public class Table implements Serializable {
         if (PrimaryKeyCheck.contains(value))
             PrimaryKeyCheck.remove(value);
         saveTable();
+        fetchBRINindices();
+        for (BrinIndex index : indexList) 
+        	index.deleteTuple(t);
+		
         return true;
     }
 
@@ -182,40 +187,6 @@ public class Table implements Serializable {
         }
         throw new DBAppException("This row does not exist in the table");
     }
-
-
-    // TODO Clear moghazy's Code
-    
-//    public ArrayList<Tuple2> firstLayerIndex(String Index_name, int columnIndex) throws IOException, DBAppException, ClassNotFoundException {
-//        ArrayList<Tuple2> tuples = new ArrayList<>();
-//        ObjectInputStream ois = null;
-//        int j = 0;
-//        File file = new File(path + tableName + "_" + j + ".class");
-//        while (file.exists()) {
-//            ois = new ObjectInputStream(new FileInputStream(file));
-//            Page page = (Page) ois.readObject();
-//            ArrayList<Tuple2> pageTuples = page.getTuples();
-//            Tuple2 temp = null;
-//            for (Tuple2 t : pageTuples) {
-//                ArrayList values = new ArrayList();
-//                values.add(t.getValues()[t.getKey()]);
-//                values.add(t.getValues()[columnIndex]);
-//                values.add(j);
-//                temp = new Tuple2(values , 0);
-//                tuples.add(t);
-//            }
-//            j++;
-//            file = new File(path + tableName + "_" + j + ".class");
-//
-//        }
-//        if (ois != null)
-//            ois.close();
-//
-//        Collections.sort(tuples);
-//        return tuples;
-//
-//    }
-
 
     public Page insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
 
@@ -314,7 +285,7 @@ public class Table implements Serializable {
 
     private Page createPage() throws IOException {
         Page page = new Page(path + tableName + "_" + (++curPageIndex) + ".class");
-        saveTable();
+        saveTable(); 
         return page;
     }
 
@@ -377,6 +348,7 @@ public class Table implements Serializable {
     	}
     	return indexList = list;
     }
+    
     public BrinIndex fetchBRINindex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File dir = new File(path);
