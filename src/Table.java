@@ -429,11 +429,11 @@ public class Table implements Serializable {
             switch (strarrOperators[i])
              {
                 case ">=":
-                    min = min(min,   objarrValues[i]);  
+                    min = min(min,objarrValues[i]);  
                     mineq=true;
                     break;
                 case ">":
-                     min = min(min,   objarrValues[i] );                     
+                     min = min(min,objarrValues[i] );                     
                     break;
                 case "<=":
                     max = max(max , objarrValues[i]);
@@ -446,7 +446,17 @@ public class Table implements Serializable {
                     break;
             }
         }
-		return index.search(min, max, mineq, maxeq);
+        Iterator<Tuple> indextuples= index.search(min, max, mineq, maxeq);
+        ArrayList<Tuple>tabletubles=new ArrayList<>();
+        while(indextuples.hasNext()){
+        	Tuple t= indextuples.next();
+        	File file = new File(path + tableName + "_" + ((Integer)t.get()[2]) + ".class");
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            Page curPage = (Page) ois.readObject();
+            tabletubles.add(curPage.getThisTuple(t.get()[1]));
+            ois.close();
+        }
+		return tabletubles.iterator();
     }
 
 	private Object max(Object max, Object object) {
