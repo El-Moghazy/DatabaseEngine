@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 public class BrinLayer implements Serializable {
 
-	private String indexPath, BrinLayerPath;
+	private String indexPath, BrinLayerPath , denseLayerPath;
 	private String indexkey;
 	private int noPages;
 	
@@ -23,15 +23,18 @@ public class BrinLayer implements Serializable {
 		this.indexkey=indexkey;
 		this.indexPath=indexPath;
 		BrinLayerPath=indexPath+"BrinLayer"+'/';
+		denseLayerPath = indexkey + "DenseLayer/";
 		noPages=-1;
 		createTBrineDirectory();
 		load();
 		saveindex();
 	}
+	
 	 private void createTBrineDirectory() {
 	        File brin = new File(BrinLayerPath);
 	        brin.mkdir();
 	    }
+	 
 	 public void load() throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException
 		{
 		 File dense = new File(indexPath+ "DenseLayer"+ '/' + "DenseLayer" + ".class");
@@ -95,6 +98,7 @@ public class BrinLayer implements Serializable {
 	        oos.writeObject(this);
 	        oos.close();
 	    }
+	    
 		public ArrayList<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
 			ArrayList<Integer> pages= new ArrayList<>();
 			for(int i=0;i<noPages;i++){
@@ -127,5 +131,58 @@ public class BrinLayer implements Serializable {
         }
         return 0;
 			
+		}
+		
+		public void refresh(int densePageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
+		{
+			int tuplesPerPage = (new Configuration()).getMaximumSize();
+			int brinPageNumber = densePageNumber /  tuplesPerPage;
+			int tuplePointer = densePageNumber % tuplesPerPage;
+			
+			while(brinPageNumber<noPages)
+			{
+				
+				File file = new File(indexPath + indexkey+"index_"+ brinPageNumber +".class");
+				Page brinPage = null;
+				if (file.exists()) {
+					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+					brinPage= (Page) ois.readObject();
+					ois.close();
+				}
+				if(brinPage==null)return;
+				
+				file = new File( denseLayerPath+ indexkey+"dense_"+ densePageNumber +".class");
+				Page densePage = null;
+				if (file.exists()) {
+					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+					densePage= (Page) ois.readObject();
+					ois.close();
+				}
+				if(densePage==null)return;
+				
+				
+				Object[] values = new Object[3];
+				values[0] =  densePage.getTuples().get(0).get()[0];
+				values[1] = densePage.getTuples().get(densePage.getTupleCount()-1).get()[0];
+				values[2] = densePageNumber;
+				
+				String[] types = new String[3];
+				types[0] = densePage.getTuples().get(0).getTypes()[0];
+				types[1] = densePage.getTuples().get(densePage.getTupleCount()-1).getTypes()[0];
+				// TODO Fix types[2]
+				types[2] = "java.lang.integer";
+				
+				String[] colName = new String[3];
+				colName[0] = densePage.getTuples().get(0).colName[0];
+				colName[1] = densePage.getTuples().get(0).colName[0];
+				colName[2] = "page.number";
+				
+				Tuple tuple=new Tuple(values, types, colName, 0);
+				brinPage.getTuples().set(tuplePointer++, tuple);
+				
+				densePageNumber++;
+				if(tuplePointer >= tuplesPerPage)
+					brinPageNumber++;
+			}
 		}
 }

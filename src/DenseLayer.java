@@ -144,6 +144,7 @@ public class DenseLayer implements Serializable {
 		Iterator<Tuple> t=tuples.iterator();
 		return t;
 	}
+	
 	public int compare(Object x,Object y){
 		switch (y.getClass().getName().toLowerCase()) {
         case "java.lang.integer":
@@ -160,4 +161,66 @@ public class DenseLayer implements Serializable {
     return 0;
 		
 	}
+
+	public void delete(Tuple tupleToDelete , int pageNum) throws DBAppException, FileNotFoundException, IOException, ClassNotFoundException		
+	{
+		if(pageNum <= noPages)
+			throw new DBAppException("Tuple doesn't exist in Dense-Layer index");
+		File file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
+		Page page = null;
+		if (file.exists()) {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+			page= (Page) ois.readObject();
+			ois.close();
+		}
+		if(page == null)
+			throw new DBAppException("Tuple doesn't exist in Dense-Layer index");
+		
+		int idx = 0;
+		// Loops over all of the tuples in this page
+		while(idx < page.getTupleCount())
+		{
+			Tuple curTuple = page.getTuples().get(idx++);
+			Object c1 = tupleToDelete.get()[tupleToDelete.getKey()];
+			Object c2 = curTuple.get()[curTuple.getKey()];
+			
+			// If the current tuple equals the tuple that we want to delete
+			if(compare(c1, c2)==0)
+			{
+				break;
+			}
+		}
+		
+		// Shift all of the next tuples
+		while(true)
+		{
+			
+			// If we reached the end of this page
+			if(idx >= page.getTupleCount() )
+			{
+				// Try to load the next page
+				if(++pageNum >= noPages)
+					break;
+				file = new File(DenseLayerPath + indexkey+"dense_"+ pageNum +".class");
+				Page tempPage = page;
+				page = null;
+				if (file.exists()) {
+					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+					page= (Page) ois.readObject();
+					ois.close();
+				}
+				if(page == null)
+					break;
+				
+				tempPage.getTuples().set(tempPage.getTupleCount()-1, page.getTuples().get(0));
+				continue;
+			}
+			page.getTuples().set(idx, page.getTuples().get(idx-1));
+			idx++;
+		}
+		
+		// Save the changes
+		saveindex();
+	}
+	
 }
