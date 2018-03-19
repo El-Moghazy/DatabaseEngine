@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -84,10 +85,10 @@ public class BrinIndex implements Serializable{
         oos.writeObject(this);
         oos.close();
 	}
-	public Iterator<Object> search(Object[] objarrValues,String[] strarrOperators) throws FileNotFoundException, ClassNotFoundException, IOException{
-		int[]pages=brinLayer.search(objarrValues,strarrOperators);
+	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, ClassNotFoundException, IOException{
+			ArrayList<Integer >pages=brinLayer.search(min,max,minEq,maxEq);
 		
-		return denseLayer.search(objarrValues,strarrOperators,pages);
+		return denseLayer.search(min,max,minEq,maxEq,pages);
 		
 	}
 }

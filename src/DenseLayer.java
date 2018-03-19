@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -125,8 +126,38 @@ public class DenseLayer implements Serializable {
         oos.close();
     }
 
-	public Iterator<Object> search(Object[] objarrValues, String[] strarrOperators, int[] pages) {
-		// TODO Auto-generated method stub
-		return null;
+	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq, ArrayList<Integer> pages) throws FileNotFoundException, IOException, ClassNotFoundException {
+		ArrayList<Tuple> tuples= new ArrayList<>();
+		for(int i=pages.get(0);i<=pages.get(pages.size()-1);i++){
+			String name = DenseLayerPath+indexkey +  "dense_" + i+ ".class";
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
+			Page page = (Page) ois.readObject();
+			for(Tuple t:page.getTuples()){
+				if(compare(t.getValues()[0],min)>=0 && compare(t.getValues()[1],max)<=0){
+					if(!((compare(t.getValues()[0],min)==0 && !minEq )|| (compare(t.getValues()[1],max)==0 && !maxEq)))
+						tuples.add(t);
+				}
+			}
+			ois.close();
+			
+		}
+		Iterator<Tuple> t=tuples.iterator();
+		return t;
+	}
+	public int compare(Object x,Object y){
+		switch (y.getClass().getName().toLowerCase()) {
+        case "java.lang.integer":
+            return ((Integer) x).compareTo(((Integer) y));
+        case "java.lang.string":
+            return ((String) x).compareTo(((String) y));
+        case "java.lang.double":
+            return ((Double) x).compareTo(((Double) y));
+        case "java.lang.boolean":
+            return ((Boolean) x).compareTo(((Boolean) y));
+        case "java.util.date":
+            return ((Date) x).compareTo(((Date) y));
+    }
+    return 0;
+		
 	}
 }

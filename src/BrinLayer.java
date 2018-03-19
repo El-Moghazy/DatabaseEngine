@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 
 
@@ -94,49 +95,37 @@ public class BrinLayer implements Serializable {
 	        oos.writeObject(this);
 	        oos.close();
 	    }
-		public int[] search(Object[] objarrValues, String[] strarrOperators) throws FileNotFoundException, IOException, ClassNotFoundException {
-			Object min = objarrValues[0];
-			Object max = objarrValues[1];
-			boolean minEq=false;
-			boolean maxEq=false;
-			switch (strarrOperators[0]) {
-			case ">=":
-				
-				break;
-			case ">":
-				
-				break;
-			case "<=":
-				
-				break;
-			case "<":
-				
-				break;
-			default:
-				break;
-			}
-			switch (strarrOperators[1]) {
-			case ">=":
-				
-				break;
-			case ">":
-				
-				break;
-			case "<=":
-				
-				break;
-			case "<":
-				
-				break;
-			default:
-				break;
-			}
+		public ArrayList<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
+			ArrayList<Integer> pages= new ArrayList<>();
 			for(int i=0;i<noPages;i++){
-				 File dense = new File(BrinLayerPath+ indexkey +  "brin_" + i + ".class");
-				 ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(dense));
-					DenseLayer ddense = (DenseLayer) ois2.readObject();
+				String name=BrinLayerPath+ indexkey +  "brin_" + i + ".class";
+				ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(name));
+				Page brin = (Page) ois2.readObject();
+				for(Tuple t:brin.getTuples()){
+					if(compare(max, t.getValues()[0])>=0 && compare(min, t.getValues()[1])<=0)
+						pages.add((Integer)t.getValues()[2]);
+						if(compare(min, t.getValues()[1])>0)
+							break;
+					}
+					ois2.close();
 			}
-					return null;
+					return pages;
 		}
 
+		public int compare(Object x,Object y){
+			switch (y.getClass().getName().toLowerCase()) {
+            case "java.lang.integer":
+                return ((Integer) x).compareTo(((Integer) y));
+            case "java.lang.string":
+                return ((String) x).compareTo(((String) y));
+            case "java.lang.double":
+                return ((Double) x).compareTo(((Double) y));
+            case "java.lang.boolean":
+                return ((Boolean) x).compareTo(((Boolean) y));
+            case "java.util.date":
+                return ((Date) x).compareTo(((Date) y));
+        }
+        return 0;
+			
+		}
 }

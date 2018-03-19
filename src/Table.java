@@ -357,7 +357,7 @@ public class Table implements Serializable {
 	/*
 	 * Returns all of the BRIN indices created on this table
 	 * */
-    public ArrayList<BrinIndex> fetchBRINindices(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
+    public ArrayList<BrinIndex> fetchBRINindices() throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File dir = new File(path);
     	ArrayList<BrinIndex> list = new ArrayList<BrinIndex>();
@@ -377,5 +377,124 @@ public class Table implements Serializable {
     	}
     	return indexList = list;
     }
+    public BrinIndex fetchBRINindex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
+    {
+    	File dir = new File(path);
+    	for(File folder : dir.listFiles())
+    	{
+    		if(folder.isDirectory())
+    		{
+    			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
+    			if (file.exists()) 
+    			{
+    				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+    				BrinIndex index = (BrinIndex) ois.readObject();
+    				ois.close();
+    				return index;
+    			}	 
+    		}
+    	}
+    	return null;
+    }
+    public Iterator<Tuple> search( String strColumnName, Object[] objarrValues, String[] strarrOperators) throws FileNotFoundException, ClassNotFoundException, IOException{
+    	BrinIndex index = fetchBRINindex(strColumnName);
+    	if(index==null)
+    		return null;
+    		Object  min ;
+    		Object  max ;
+    		switch (htblColNameType.get(strColumnName).toLowerCase())
+            {
+            case "java.lang.integer":
+				min=Integer.MIN_VALUE;
+				max=Integer.MAX_VALUE;
+			case "java.lang.string":
+				min="";
+				max="ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+			case "java.lang.double":
+				min=Double.MIN_VALUE;
+				max=Double.MAX_VALUE;
+			
+			case "java.util.date":
+				min=new Date(Long.MIN_VALUE);
+				max=new Date(Long.MAX_VALUE);
+			default:
+				min=Integer.MIN_VALUE;
+				max=Integer.MAX_VALUE;
+           }
+        
+        boolean mineq=false;
+        boolean maxeq=false;
+        for(int i = 0; i < objarrValues.length;i++)
+        {
+            switch (strarrOperators[i])
+             {
+                case ">=":
+                    min = min(min,   objarrValues[i]);  
+                    mineq=true;
+                    break;
+                case ">":
+                     min = min(min,   objarrValues[i] );                     
+                    break;
+                case "<=":
+                    max = max(max , objarrValues[i]);
+                    maxeq=true;
+                    break;
+                case "<":
+                    max = max(max , objarrValues[i] );
+                    break;
+                default:
+                    break;
+            }
+        }
+		return index.search(min, max, mineq, maxeq);
+    }
 
+	private Object max(Object max, Object object) {
+
+        String type =object.getClass().toString();
+
+        if (type.contains("Integer")) {
+            return Math.max((Integer)max,(Integer) object);        
+        } else if (type.contains("Double")) {
+        	 return Math.max((Integer)max,(Integer) object);
+            
+        } else if (type.contains("String")) {
+        	if(((String)max).compareTo((String)object)==1)
+        		return max;
+        	else
+        		return object;
+        } else if (type.contains("Date")) {
+        	if(((Date)max).compareTo((Date)object)==1)
+    			return max;
+    		else
+    			return object;
+
+        }
+    
+		return null;
+	}
+
+	private Object min(Object min, Object object) {
+		   String type =object.getClass().toString();
+
+	        if (type.contains("Integer")) {
+	            return Math.min((Integer)min,(Integer) object);        
+	        } else if (type.contains("Double")) {
+	        	 return Math.min((Integer)min,(Integer) object);
+	            
+	        } else if (type.contains("String")) {
+	        	if(((String)min).compareTo((String)object)==-1)
+	        		return min;
+	        	else
+	        		return object;
+	        } else if (type.contains("Date")) {
+	        	if(((Date)min).compareTo((Date)object)==-1)
+	    			return min;
+	    		else
+	    			return object;
+
+	        }
+	    
+			return null;
+	}
 }
