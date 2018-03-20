@@ -49,7 +49,7 @@ public class DBApp implements Serializable{
 		this.MaxRowsPerPage = config.getMaximumSize();
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
-		
+
 
 		// Meta data file
 		File data = new File(dbPath + "data/");
@@ -69,7 +69,7 @@ public class DBApp implements Serializable{
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(database));
         oos.writeObject(this);
         oos.close();
-		
+
 	}
 
 	public void createTable(String strTableName, String strClusteringKeyColumn,
@@ -156,8 +156,8 @@ public class DBApp implements Serializable{
 		}
 		return null;
 	}
-	
-	public void createBRINIndex(String strTableName,String strColName) throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException 
+
+	public void createBRINIndex(String strTableName,String strColName) throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException
 	{
 		// TODO Find the table and create respective index
 		Table table = getTable(strTableName);
@@ -170,7 +170,7 @@ public class DBApp implements Serializable{
 		writeIndexMetadata(strTableName,strColumnName);
 		savedatabase();
 				return getTable(strTableName).search(strColumnName, objarrValues, strarrOperators);
-		
+
 	}
 
 	private void writeIndexMetadata(String strTableName,String strColumnName) throws IOException {
@@ -178,11 +178,11 @@ public class DBApp implements Serializable{
 		ArrayList<String> mdata= new ArrayList<>();
 		while(reader.ready()){
 			String line = reader.readLine();
-		
+
 			StringTokenizer st = new StringTokenizer(line,",");
 			if(st.nextToken().equals(strTableName) & st.nextToken().equals(strColumnName)){
 				line=line.substring(0, line.length()-5)+"true";
-				
+
 			}
 			mdata.add(line);
 		}
@@ -190,13 +190,13 @@ public class DBApp implements Serializable{
 		this.metadata = new File(dbPath + "data/" + "metadata.csv");
 			metadata.delete();
 			metadata.createNewFile();
-			
+
 			writer = new FileWriter(metadata, true);
 			for(String line : mdata)
 				writer.append(line+ '\n');
 			writer.flush();
 			writer.close();
-			
-		
+
+
 	}
 }
