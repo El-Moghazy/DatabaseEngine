@@ -70,7 +70,6 @@ public class BrinLayer implements Serializable {
 			for (int i = 0; i <= ddense.noPages; i++) 
 			{
 				// Student_0.class
-				System.out.println( indexPath+ "DenseLayer"+ '/' + indexkey+"dense" + "_"+i+".class");
 				String name = indexPath+ "DenseLayer"+ '/' + indexkey+"dense" + "_"+i+".class";
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 				Page page = (Page) ois.readObject();
