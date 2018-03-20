@@ -8,14 +8,15 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 
 
 public class BrinLayer implements Serializable {
 
-	private String indexPath, BrinLayerPath , denseLayerPath;
-	private String indexkey;
-	private int noPages;
+	public String indexPath, BrinLayerPath , denseLayerPath;
+	public String indexkey;
+	public int noPages;
 	
 	public BrinLayer(String indexPath,String indexkey) throws IOException, ClassNotFoundException, DBAppException{
 		this.indexkey=indexkey;
@@ -46,7 +47,6 @@ public class BrinLayer implements Serializable {
 			for (int i = 0; i <= ddense.noPages; i++) 
 			{
 				// Student_0.class
-				System.out.println( indexPath+ "DenseLayer"+ '/' + indexkey+"dense" + "_"+i+".class");
 				String name = indexPath+ "DenseLayer"+ '/' + indexkey+"dense" + "_"+i+".class";
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 				Page page = (Page) ois.readObject();
@@ -98,8 +98,8 @@ public class BrinLayer implements Serializable {
 	        oos.close();
 	    }
 	    
-		public ArrayList<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
-			ArrayList<Integer> pages= new ArrayList<>();
+		public HashSet<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
+			HashSet<Integer> pages= new HashSet<>();
 			for(int i=0;i<=noPages;i++){
 				String name=BrinLayerPath+ indexkey +  "brin_" + i + ".class";
 				ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(name));
@@ -116,7 +116,7 @@ public class BrinLayer implements Serializable {
 		}
 
 		public int compare(Object x,Object y){
-			switch (y.getClass().getName().toLowerCase()) {
+			switch (x.getClass().getName().toLowerCase()) {
             case "java.lang.integer":
                 return ((Integer) x).compareTo(((Integer) y));
             case "java.lang.string":
@@ -187,4 +187,14 @@ public class BrinLayer implements Serializable {
 			}
 			saveindex();
 		}
+		
+		
+		public void drop() throws IOException
+		{
+			File dir = new File(indexPath);
+			for(File file : dir.listFiles())
+				file.delete();
+			
+		}
+		
 }

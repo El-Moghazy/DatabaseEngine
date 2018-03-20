@@ -1,9 +1,12 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +15,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
-public class DBApp {
+public class DBApp implements Serializable{
 
 	private String defaultPath = "databases/";
 	private String name, dbPath;
@@ -24,10 +27,10 @@ public class DBApp {
 																		// here
 	private Hashtable<String, String> htblColNameType;
 	private HashMap<String, Table> tables = new HashMap<>();
-	private FileWriter writer;
+	private transient FileWriter writer;
 
-	private File metadata;
-	private Properties properties;
+	private transient File metadata;
+	private transient Properties properties;
 	private Integer MaxRowsPerPage;
 
 	public HashMap<String, Table> getTables() {
@@ -42,7 +45,7 @@ public class DBApp {
 		this.MaxRowsPerPage = config.getMaximumSize();
 		File dbFolder = new File(dbPath);
 		dbFolder.mkdir();
-
+		
 
 		// Meta data file
 		File data = new File(dbPath + "data/");
@@ -50,7 +53,18 @@ public class DBApp {
 
 		this.metadata = new File(dbPath + "data/" + "metadata.csv");
 		metadata.createNewFile();
+		 savedatabase();
 
+	}
+
+	private void savedatabase() throws IOException {
+		File database = new File(defaultPath + "Database" + ".class");
+        if (!database.exists())
+            database.createNewFile();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(database));
+        oos.writeObject(this);
+        oos.close();
+		
 	}
 
 	public void createTable(String strTableName, String strClusteringKeyColumn,
@@ -75,7 +89,7 @@ public class DBApp {
 				indexed = true;
 
 			WriteMetaData(strTableName, column, htblColNameType.get(column), key, indexed);
-
+			savedatabase();
 		}
 	}
 
@@ -100,6 +114,7 @@ public class DBApp {
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.insert(htblColNameValue))
 			throw new DBAppException("Insertion in table: (" + strTableName + ")failed");
+		savedatabase();
 	}
 
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
@@ -111,6 +126,7 @@ public class DBApp {
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.delete(htblColNameValue))
 			throw new DBAppException("Deletion in table: (" + strTableName + ")failed");
+		savedatabase();
 	}
 
 	public void updateTable(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
@@ -121,6 +137,7 @@ public class DBApp {
 			throw new DBAppException("Table: (" + strTableName + ") does not exist");
 		if (!table.update(strKey, htblColNameValue))
 			throw new DBAppException("Update in table: (" + strTableName + ")failed");
+		savedatabase();
 	}
 
 	private Table getTable(String strTableName) throws FileNotFoundException, IOException, ClassNotFoundException {
@@ -145,6 +162,7 @@ public class DBApp {
 			 Object[] objarrValues,
 			 String[] strarrOperators)
 			throws DBAppException, FileNotFoundException, ClassNotFoundException, IOException {
+		savedatabase();
 				return getTable(strTableName).search(strColumnName, objarrValues, strarrOperators);
 		
 	}

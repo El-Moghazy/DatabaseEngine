@@ -91,9 +91,9 @@ public class Table implements Serializable {
        int page= insertTuple(t);
         PrimaryKeyCheck.add(value);
         saveTable();
-        fetchBRINindices();
-        for (BrinIndex index : indexList)
-        	createBRINIndex(index.getIndexColName());
+        rollBack();
+        saveTable();
+
         return true;
 
     }
@@ -106,9 +106,8 @@ public class Table implements Serializable {
         if (PrimaryKeyCheck.contains(value))
             PrimaryKeyCheck.remove(value);
         saveTable();
-        fetchBRINindices();
-        for (BrinIndex index : indexList)
-        	createBRINIndex(index.getIndexColName());
+        rollBack();
+        saveTable();
 
         return true;
     }
@@ -125,10 +124,9 @@ public class Table implements Serializable {
         if (PrimaryKeyCheck.contains(oldKey))
             PrimaryKeyCheck.remove(oldKey);
         saveTable();
-        fetchBRINindices();
-        for (BrinIndex index : indexList) {
-        	createBRINIndex(index.getIndexColName());
-        }
+        rollBack();
+        saveTable();
+
         return true;
     }
 
@@ -369,7 +367,7 @@ public class Table implements Serializable {
     	{
     		if(folder.isDirectory())
     		{
-    			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
+    			File file = new File(path+folder.getName()+"/"+strColName+".class");
     			if (file.exists())
     			{
     				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
@@ -389,25 +387,25 @@ public class Table implements Serializable {
         Object max;
         switch (htblColNameType.get(strColumnName).toLowerCase()) {
         case "java.lang.integer":
-            min = Integer.MIN_VALUE;
-            max = Integer.MAX_VALUE;
+            min = Integer.MAX_VALUE;
+            max = Integer.MIN_VALUE;
             break;
         case "java.lang.string":
-            min = "";
-            max = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+            min = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+            max = "";
             break;
         case "java.lang.double":
-            min = Double.MIN_VALUE;
-            max = Double.MAX_VALUE;
+            min = Double.MAX_VALUE;
+            max = Double.MIN_VALUE;
             break;
 
         case "java.util.date":
-            min = new Date(Long.MIN_VALUE);
-            max = new Date(Long.MAX_VALUE);
+            min = new Date(Long.MAX_VALUE);
+            max = new Date(Long.MIN_VALUE);
             break;
         default:
-            min = Integer.MIN_VALUE;
-            max = Integer.MAX_VALUE;
+            min = Integer.MAX_VALUE;
+            max = Integer.MIN_VALUE;
         }
 
         boolean mineq = false;
@@ -476,7 +474,11 @@ public class Table implements Serializable {
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
             while (indextuples.hasNext()) {
                 Tuple t = indextuples.next();
-                tabletubles.add(binarySearch(t.get()[t.getKey()]));
+//                tabletubles.add(binarySearch(t.get()[t.getKey()]));
+                File file = new File(path + tableName + "_" + t.getValues()[2] + ".class");
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                Page curPage = (Page) ois.readObject();
+                tabletubles.add(curPage.getThisTuple(t.getValues()[1]));
             }
             return tabletubles.iterator();
 
@@ -593,6 +595,24 @@ public class Table implements Serializable {
             return ((Date) x).compareTo(((Date) y));
     }
     return 0;
+
+	}
+	
+	public void rollBack() throws IOException, ClassNotFoundException, DBAppException
+	{
+		fetchBRINindices();
+        ArrayList<String> indexedColNames = new ArrayList<String>();
+        
+        for (BrinIndex index : indexList)
+        {
+//        	index.insertTuple(t,page);
+        	indexedColNames.add(index.getIndexColName());
+//        	createBRINIndex(index.getIndexColName());
+        	index.drop();
+        }
+        indexList = new ArrayList<BrinIndex>();
+        for(String col : indexedColNames)
+        	createBRINIndex(col);
 
 	}
 }

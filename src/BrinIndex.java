@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -88,7 +89,7 @@ public class BrinIndex implements Serializable{
 	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, ClassNotFoundException, IOException{
 		fetchBrinLayer();
 		fetchDenseLayer();
-			ArrayList<Integer >pages=brinLayer.search(min,max,minEq,maxEq);
+			HashSet<Integer> pages=brinLayer.search(min,max,minEq,maxEq);
 		
 		return denseLayer.search(min,max,minEq,maxEq,pages);
 		
@@ -99,7 +100,7 @@ public class BrinIndex implements Serializable{
 		fetchBrinLayer();
 		fetchDenseLayer();
 		// Read page number from brin layer
-		ArrayList<Integer> list = new ArrayList<Integer>();
+		HashSet<Integer> list = new HashSet<>();
 		Object idx = tupleToDelete.get()[tupleToDelete.getIndex(indexColName)];
 		list = brinLayer.search(idx, idx, true, true);
 		if(list.isEmpty())
@@ -107,7 +108,7 @@ public class BrinIndex implements Serializable{
 			System.err.println("Delete-trace: Tuple doesn't exist in index");
 			return;
 		}
-		int pageNumber = list.get(0);
+		int pageNumber = list.iterator().next();
 		
 		denseLayer.delete(tupleToDelete, pageNumber);
 		brinLayer.refresh(pageNumber,denseLayer.noPages);
@@ -116,18 +117,27 @@ public class BrinIndex implements Serializable{
 	public void insertTuple(Tuple t, int pagetable) throws FileNotFoundException, ClassNotFoundException, IOException, DBAppException {
 		fetchBrinLayer();
 		fetchDenseLayer();
-		ArrayList<Integer> list = new ArrayList<Integer>();
+		HashSet<Integer> list = new HashSet<>();
 		Object idx = t.get()[t.getIndex(indexColName)];
 		list = brinLayer.search(idx, idx, true, true);
 		int page;
 		if(list.isEmpty())
 			page=denseLayer.noPages;
 		else
-			page=list.get(0);
+			page=list.iterator().next();
 		page=denseLayer.insert(t, page,pagetable);
 		brinLayer.refresh(page,denseLayer.noPages);
-		
-		
+	}
+	
+	public void drop() throws IOException, ClassNotFoundException
+	{
+		fetchBrinLayer();
+		fetchDenseLayer();
+		denseLayer.drop();
+		brinLayer.drop();
+		File dir = new File(indexPath);
+		for(File file : dir.listFiles())
+			file.delete();
 		
 	}
 

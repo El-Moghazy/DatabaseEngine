@@ -9,16 +9,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 public class DenseLayer implements Serializable {
-	private String primarykey;
-	private String indexkey;
-	private String tableName,dataPath,indexPath, DenseLayerPath;
-	private Hashtable<String, String> htblColNameType;
-	private Table myTable;
-	int noPages;
+	public String primarykey;
+	public String indexkey;
+	public String tableName,dataPath,indexPath, DenseLayerPath;
+	public Hashtable<String, String> htblColNameType;
+	public Table myTable;
+	public int noPages;
 
 	public DenseLayer(String indexPath,Hashtable<String, String> htblColNameType,String indexkey,String primarykey,String dataPath,String tableName) throws IOException, ClassNotFoundException, DBAppException
 	{
@@ -96,7 +97,8 @@ public class DenseLayer implements Serializable {
 		}
 
 		Collections.sort(data);
-
+		if(data.isEmpty())
+			return;
 		Page curPage = createPage();
 		for (int i = 0; i < data.size(); i++)
 		{
@@ -126,10 +128,10 @@ public class DenseLayer implements Serializable {
         oos.close();
     }
 
-	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq, ArrayList<Integer> pages) throws FileNotFoundException, IOException, ClassNotFoundException {
+	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq, HashSet<Integer> pages) throws FileNotFoundException, IOException, ClassNotFoundException {
 		ArrayList<Tuple> tuples= new ArrayList<>();
-		for(int i=pages.get(0);i<=pages.get(pages.size()-1);i++){
-			String name = DenseLayerPath+indexkey +  "dense_" + i+ ".class";
+		while(pages.iterator().hasNext()){
+			String name = DenseLayerPath+indexkey +  "dense_" + pages.iterator().next()+ ".class";
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 			Page page = (Page) ois.readObject();
 			for(Tuple t:page.getTuples()){
@@ -281,5 +283,15 @@ public class DenseLayer implements Serializable {
 		}
 		return page;
 	}
+	
+	public void drop() throws IOException
+	{
+		File dir = new File(DenseLayerPath);
+		for(File file : dir.listFiles())
+			file.delete();
+		
+	}
+
+	
 
 }
