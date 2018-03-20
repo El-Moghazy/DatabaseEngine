@@ -10,13 +10,26 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-
+/**
+ *
+ */
 public class BrinLayer implements Serializable {
 
 	public String indexPath, BrinLayerPath , denseLayerPath;
 	public String indexkey;
 	public int noPages;
-	
+
+	/**
+	 * Created a Brin Index for the specified column
+	 *
+	 * @param indexPath
+	 * 				 The path to save the index
+	 * @param indexkey
+	 * 				 The Key on which the index will be applied
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws DBAppException
+	 */
 	public BrinLayer(String indexPath,String indexkey) throws IOException, ClassNotFoundException, DBAppException{
 		this.indexkey=indexkey;
 		this.indexPath=indexPath;
@@ -27,12 +40,23 @@ public class BrinLayer implements Serializable {
 		load();
 		saveindex();
 	}
-	
+
+	/**
+	 * Creates the Directory for the index.
+	 *
+	 */
 	 private void createTBrineDirectory() {
 	        File brin = new File(BrinLayerPath);
 	        brin.mkdir();
 	    }
-	 
+
+	/**
+	 * Loads the index from path
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws DBAppException
+	 */
 	 public void load() throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException
 		{
 		 File dense = new File(indexPath+ "DenseLayer"+ '/' + "DenseLayer" + ".class");
@@ -83,12 +107,23 @@ public class BrinLayer implements Serializable {
 			
 		}
 
+	/**
+	 * Returns a new page
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	    private Page createPage() throws IOException {
 	    	Page page = new Page(BrinLayerPath+ indexkey +  "brin_" + (++noPages) + ".class");
 	    	saveindex();
 	        return page;
 	    }
 
+	/**
+	 * Saves Index to the Disk
+	 *
+	 * @throws IOException
+	 */
 	    private void saveindex() throws IOException {
 	        File brin = new File(BrinLayerPath + "BrinLayer" + ".class");
 	        if (!brin.exists())
@@ -97,7 +132,23 @@ public class BrinLayer implements Serializable {
 	        oos.writeObject(this);
 	        oos.close();
 	    }
-	    
+
+	/**
+	 *
+	 * Returns the targeted pages for the index
+	 * Using the min and max specified and comparing it to the targeted values
+	 *
+	 * @param min
+	 * 			 Min value
+	 * @param max
+	 * 			 Max value
+	 * @param minEq
+	 * @param maxEq
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 		public ArrayList<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
 			ArrayList<Integer> pages= new ArrayList<>();
 			for(int i=0;i<=noPages;i++){
@@ -115,6 +166,16 @@ public class BrinLayer implements Serializable {
 					return pages;
 		}
 
+	/**
+	 *
+	 * Compares two objects
+	 *
+	 * @param x
+	 * 			 First object to be compared
+	 * @param y
+	 * 			 The Other object to be compared
+	 * @return
+	 */
 		public int compare(Object x,Object y){
 			switch (x.getClass().getName().toLowerCase()) {
             case "java.lang.integer":
@@ -131,7 +192,20 @@ public class BrinLayer implements Serializable {
         return 0;
 			
 		}
-		
+
+	/**
+	 * Refreshes the index after any change
+	 *
+	 *
+	 * @param densePageNumber
+	 * 					 The page number among index pages
+	 * @param maxDensePageNumber
+	 * 					 Max number of pages in the index
+	 *
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 		public void refresh(int densePageNumber,int maxDensePageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
 		{
 			int tuplesPerPage = (new Configuration()).getMaximumSize();
@@ -187,8 +261,14 @@ public class BrinLayer implements Serializable {
 			}
 			saveindex();
 		}
-		
-		
+
+
+	/**
+	 * Delets the index file
+	 *
+	 *
+	 * @throws IOException
+	 */
 		public void drop() throws IOException
 		{
 			File dir = new File(indexPath);
