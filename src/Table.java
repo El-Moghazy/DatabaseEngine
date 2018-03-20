@@ -90,6 +90,7 @@ public class Table implements Serializable {
             throw new DBAppException("Insertion in table failed. PrimaryKey value already exist in the table");
        int page= insertTuple(t);
         PrimaryKeyCheck.add(value);
+        fetchBRINindices();
         saveTable();
         for (BrinIndex index : indexList)
         	index.insertTuple(t,page);
@@ -510,7 +511,7 @@ public class Table implements Serializable {
 	        if (type.contains("Integer")) {
 	            return Math.min((Integer)min,(Integer) object);
 	        } else if (type.contains("Double")) {
-	        	 return Math.min((Integer)min,(Integer) object);
+	        	 return Math.min((Double)min,(Integer) object);
 
 	        } else if (type.contains("String")) {
 	        	if(((String)min).compareTo((String)object)==-1)

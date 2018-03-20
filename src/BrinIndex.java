@@ -86,6 +86,8 @@ public class BrinIndex implements Serializable{
         oos.close();
 	}
 	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, ClassNotFoundException, IOException{
+		fetchBrinLayer();
+		fetchDenseLayer();
 			ArrayList<Integer >pages=brinLayer.search(min,max,minEq,maxEq);
 		
 		return denseLayer.search(min,max,minEq,maxEq,pages);

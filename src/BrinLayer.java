@@ -43,7 +43,7 @@ public class BrinLayer implements Serializable {
 				ois2.close();
 			
 				Page curPage = createPage();
-			for (int i = 0; i < ddense.noPages; i++) 
+			for (int i = 0; i <= ddense.noPages; i++) 
 			{
 				// Student_0.class
 				System.out.println( indexPath+ "DenseLayer"+ '/' + indexkey+"dense" + "_"+i+".class");
@@ -53,6 +53,7 @@ public class BrinLayer implements Serializable {
 				ois.close();
 				
 				int length = page.getTuples().size();
+				if(length==0)continue;
 				
 				Object[] values = new Object[3];
 				values[0] =  page.getTuples().get(0).get()[0];
@@ -77,7 +78,7 @@ public class BrinLayer implements Serializable {
 				curPage.insert(tuple, false);
 			}
 			curPage.savePage();
-			
+			saveindex();
 			
 			
 		}
@@ -99,7 +100,7 @@ public class BrinLayer implements Serializable {
 	    
 		public ArrayList<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
 			ArrayList<Integer> pages= new ArrayList<>();
-			for(int i=0;i<noPages;i++){
+			for(int i=0;i<=noPages;i++){
 				String name=BrinLayerPath+ indexkey +  "brin_" + i + ".class";
 				ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(name));
 				Page brin = (Page) ois2.readObject();
@@ -184,5 +185,6 @@ public class BrinLayer implements Serializable {
 				if(tuplePointer >= tuplesPerPage)
 					brinPageNumber++;
 			}
+			saveindex();
 		}
 }

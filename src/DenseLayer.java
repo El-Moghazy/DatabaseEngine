@@ -107,7 +107,7 @@ public class DenseLayer implements Serializable {
 			}
 			curPage.insert(data.get(i), true);
 		}
-
+		curPage.savePage();
 	}
 
     private Page createPage() throws IOException {
@@ -182,7 +182,7 @@ public class DenseLayer implements Serializable {
 		{
 			Tuple curTuple = page.getTuples().get(idx++);
 			Object c1 = tupleToDelete.get()[tupleToDelete.getKey()];
-			Object c2 = curTuple.get()[curTuple.getKey()];
+			Object c2 = curTuple.get()[1];
 
 			// If the current tuple equals the tuple that we want to delete
 			if(compare(c1, c2)==0)
@@ -227,8 +227,8 @@ public class DenseLayer implements Serializable {
 		colName[2] = "page.number";
 
 		Tuple newTuple = new Tuple(values, types, colName, 0);
-		if(pageNum > noPages){
-			File file = new File(DenseLayerPath + indexkey+"dense_"+ (pageNum-1) +".class");
+		if(pageNum >= noPages){
+			File file = new File(DenseLayerPath + indexkey+"dense_"+ (pageNum) +".class");
 			Page page = null;
 			if (file.exists()) {
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
@@ -239,7 +239,7 @@ public class DenseLayer implements Serializable {
 					page=createPage();
 				page.insert(newTuple, true);
 				saveindex();
-				return noPages-1;
+				return noPages;
 			}
 			for(int i=pageNum;i<=noPages;i++){
 				File file2 = new File(DenseLayerPath + indexkey+"dense_"+ i +".class");
@@ -249,14 +249,17 @@ public class DenseLayer implements Serializable {
 					curpage= (Page) ois.readObject();
 					ois.close();
 				}
+				if(curpage==null)break;
 				if(curpage.isFull()){
 					Tuple tmp=curpage.getTuples().get(curpage.getTuples().size()-1);
 					curpage.getTuples().remove(tmp);
 					curpage.insert(newTuple, true);
 					newTuple=tmp;
+					curpage.savePage();
 				}
 				else{
 					curpage.insert(newTuple, true);
+					curpage.savePage();
 					break;
 				}
 			}
