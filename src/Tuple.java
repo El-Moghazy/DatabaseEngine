@@ -3,6 +3,11 @@ import java.util.Date;
 
 public class Tuple implements Serializable, Comparable<Tuple> {
 
+    /**
+     * A Tuple represents a row/relation in a table.
+     * It consists of an array of values.
+     */
+
     private static final long serialVersionUID = 1L;
 
     public Object[] getValues() {
@@ -10,26 +15,43 @@ public class Tuple implements Serializable, Comparable<Tuple> {
     }
 
     private Object[] values;
-    public String[] types,colName;
+    public String[] types, colName;
     private int key;
 
-    public Tuple(Object[] values, String[] types,String[] colName, int key) {
+
+    /**
+     * Creates a new tuple
+     * @param values array of values which will be in the tuple
+     * @param types  array of the types of values which will be in the tuple
+     * @param colName array of columns name in the tuple
+     * @param key Primary key in the tuple
+     */
+    public Tuple(Object[] values, String[] types, String[] colName, int key) {
         this.values = values;
         this.types = types;
         this.key = key;
         this.colName = colName;
     }
-    
-    public int getIndex(String s) 
-    {
-    	
-    	for (int i = 0; i < colName.length; i++) {
-			if(colName[i] != null && colName[i].equals(s))
-				return i;
-		}
-    	return -1;
+
+
+    /**
+     * Get the index of the given string
+     * @param s string to search for it's index
+     * @return  given string index
+     */
+    public int getIndex(String s) {
+
+        for (int i = 0; i < colName.length; i++) {
+            if (colName[i] != null && colName[i].equals(s))
+                return i;
+        }
+        return -1;
     }
 
+    /**
+     * display tuple values
+     * @return
+     */
     @Override
     public String toString() {
         String result = "";
@@ -43,14 +65,29 @@ public class Tuple implements Serializable, Comparable<Tuple> {
         return result;
     }
 
+
+    /**
+     * add new value to specific index
+     * @param index location for inserted value
+     * @param value the object value needed to be inserted
+     */
     public void add(int index, Object value) {
         values[index] = value;
     }
 
+    /**
+     * get the tuple's values array
+     * @return
+     */
     public Object[] get() {
         return values;
     }
 
+    /**
+     * check if two objects are equals
+      * @param o objects to be compared with
+     * @return true if the are equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         Tuple t = (Tuple) o;
@@ -82,6 +119,12 @@ public class Tuple implements Serializable, Comparable<Tuple> {
         return equal;
     }
 
+
+    /**
+     * comparing tuples
+     * @param t tuple to be compared with
+     * @return
+     */
     @Override
     public int compareTo(Tuple t) {
         boolean equal = true;
@@ -126,10 +169,18 @@ public class Tuple implements Serializable, Comparable<Tuple> {
         return 0;
     }
 
+    /**
+     * get the types of the values inside the tuple
+     * @return the types of the values
+     */
     public String[] getTypes() {
         return types;
     }
 
+    /**
+     * get the primary key
+     * @return primary key
+     */
     public int getKey() {
         return key;
     }
