@@ -126,8 +126,17 @@ public class BrinIndex implements Serializable{
 			page=list.get(0);
 		page=denseLayer.insert(t, page,pagetable);
 		brinLayer.refresh(page,denseLayer.noPages);
-		
-		
+	}
+	
+	public void drop() throws IOException, ClassNotFoundException
+	{
+		fetchBrinLayer();
+		fetchDenseLayer();
+		denseLayer.drop();
+		brinLayer.drop();
+		File dir = new File(indexPath);
+		for(File file : dir.listFiles())
+			file.delete();
 		
 	}
 

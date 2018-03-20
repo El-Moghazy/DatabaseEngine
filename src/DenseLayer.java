@@ -96,7 +96,8 @@ public class DenseLayer implements Serializable {
 		}
 
 		Collections.sort(data);
-
+		if(data.isEmpty())
+			return;
 		Page curPage = createPage();
 		for (int i = 0; i < data.size(); i++)
 		{
@@ -280,6 +281,14 @@ public class DenseLayer implements Serializable {
 			ois.close();
 		}
 		return page;
+	}
+	
+	public void drop() throws IOException
+	{
+		File dir = new File(DenseLayerPath);
+		for(File file : dir.listFiles())
+			file.delete();
+		
 	}
 
 }

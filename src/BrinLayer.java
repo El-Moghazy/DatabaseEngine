@@ -187,4 +187,14 @@ public class BrinLayer implements Serializable {
 			}
 			saveindex();
 		}
+		
+		
+		public void drop() throws IOException
+		{
+			File dir = new File(indexPath);
+			for(File file : dir.listFiles())
+				file.delete();
+			
+		}
+		
 }

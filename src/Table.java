@@ -90,11 +90,9 @@ public class Table implements Serializable {
             throw new DBAppException("Insertion in table failed. PrimaryKey value already exist in the table");
        int page= insertTuple(t);
         PrimaryKeyCheck.add(value);
-        fetchBRINindices();
         saveTable();
-        fetchBRINindices();
-        for (BrinIndex index : indexList)
-        	index.insertTuple(t,page);
+        rollBack();
+        saveTable();
         return true;
 
     }
@@ -107,10 +105,8 @@ public class Table implements Serializable {
         if (PrimaryKeyCheck.contains(value))
             PrimaryKeyCheck.remove(value);
         saveTable();
-        fetchBRINindices();
-        for (BrinIndex index : indexList)
-        	index.deleteTuple(t);
-
+        rollBack();
+        saveTable();
         return true;
     }
 
@@ -126,11 +122,8 @@ public class Table implements Serializable {
         if (PrimaryKeyCheck.contains(oldKey))
             PrimaryKeyCheck.remove(oldKey);
         saveTable();
-        fetchBRINindices();
-        for (BrinIndex index : indexList) {
-        	index.deleteTuple(old);
-        	index.insertTuple(t,pagetmp);
-        }
+        rollBack();
+        saveTable();
         return true;
     }
 
@@ -478,7 +471,11 @@ public class Table implements Serializable {
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
             while (indextuples.hasNext()) {
                 Tuple t = indextuples.next();
-                tabletubles.add(binarySearch(t.get()[t.getKey()]));
+//                tabletubles.add(binarySearch(t.get()[t.getKey()]));
+                File file = new File(path + tableName + "_" + t.getValues()[2] + ".class");
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                Page curPage = (Page) ois.readObject();
+                tabletubles.add(curPage.getThisTuple(t.getValues()[1]));
             }
             return tabletubles.iterator();
 
@@ -595,6 +592,24 @@ public class Table implements Serializable {
             return ((Date) x).compareTo(((Date) y));
     }
     return 0;
+
+	}
+	
+	public void rollBack() throws IOException, ClassNotFoundException, DBAppException
+	{
+		fetchBRINindices();
+        ArrayList<String> indexedColNames = new ArrayList<String>();
+        
+        for (BrinIndex index : indexList)
+        {
+//        	index.insertTuple(t,page);
+        	indexedColNames.add(index.getIndexColName());
+//        	createBRINIndex(index.getIndexColName());
+        	index.drop();
+        }
+        indexList = new ArrayList<BrinIndex>();
+        for(String col : indexedColNames)
+        	createBRINIndex(col);
 
 	}
 }
