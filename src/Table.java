@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
-import com.sun.javafx.scene.paint.GradientUtils.Point;
 
 public class Table implements Serializable {
 
