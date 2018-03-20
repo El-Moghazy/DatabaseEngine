@@ -1,19 +1,23 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 public class DBApp implements Serializable{
 
@@ -52,7 +56,8 @@ public class DBApp implements Serializable{
 		data.mkdirs();
 
 		this.metadata = new File(dbPath + "data/" + "metadata.csv");
-		metadata.createNewFile();
+		if(!metadata.exists())
+			metadata.createNewFile();
 		 savedatabase();
 
 	}
@@ -162,8 +167,36 @@ public class DBApp implements Serializable{
 			 Object[] objarrValues,
 			 String[] strarrOperators)
 			throws DBAppException, FileNotFoundException, ClassNotFoundException, IOException {
+		writeIndexMetadata(strTableName,strColumnName);
 		savedatabase();
 				return getTable(strTableName).search(strColumnName, objarrValues, strarrOperators);
+		
+	}
+
+	private void writeIndexMetadata(String strTableName,String strColumnName) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(metadata));
+		ArrayList<String> mdata= new ArrayList<>();
+		while(reader.ready()){
+			String line = reader.readLine();
+		
+			StringTokenizer st = new StringTokenizer(line,",");
+			if(st.nextToken().equals(strTableName) & st.nextToken().equals(strColumnName)){
+				line=line.substring(0, line.length()-5)+"true";
+				
+			}
+			mdata.add(line);
+		}
+			reader.close();
+		this.metadata = new File(dbPath + "data/" + "metadata.csv");
+			metadata.delete();
+			metadata.createNewFile();
+			
+			writer = new FileWriter(metadata, true);
+			for(String line : mdata)
+				writer.append(line+ '\n');
+			writer.flush();
+			writer.close();
+			
 		
 	}
 }

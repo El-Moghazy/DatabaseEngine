@@ -381,7 +381,7 @@ public class Table implements Serializable {
     }
     public Iterator<Tuple> search(String strColumnName, Object[] objarrValues, String[] strarrOperators)
             throws FileNotFoundException, ClassNotFoundException, IOException {
-        BrinIndex index = fetchBRINindex(strColumnName);
+       
 
         Object min;
         Object max;
@@ -431,8 +431,6 @@ public class Table implements Serializable {
             }
         }
 
-        if (index == null) {
-
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
 
             for (int i = 0; i <= this.getCurPageIndex(); i++) {
@@ -468,9 +466,9 @@ public class Table implements Serializable {
 
             return tabletubles.iterator();
 
-        } else {
+        
 
-            Iterator<Tuple> indextuples = index.search(min, max, mineq, maxeq);
+    /*        Iterator<Tuple> indextuples = index.search(min, max, mineq, maxeq);
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
             while (indextuples.hasNext()) {
                 Tuple t = indextuples.next();
@@ -479,10 +477,11 @@ public class Table implements Serializable {
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
                 Page curPage = (Page) ois.readObject();
                 tabletubles.add(curPage.getThisTuple(t.getValues()[1]));
+                ois.close();
             }
             return tabletubles.iterator();
 
-        }
+        */
     }
 
 	private Object max(Object max, Object object) {

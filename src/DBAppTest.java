@@ -105,8 +105,9 @@ public class DBAppTest {
 			strarrOperators[1] = "<";
 			Iterator resultSet = ourDB.selectFromTable(strTableName, "gpa",
 					objarrValues, strarrOperators );
+			System.err.println("__________Select__________");
 			while(resultSet.hasNext())
-				System.err.println(resultSet.next().toString());
+				System.out.println(resultSet.next().toString());
 
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());

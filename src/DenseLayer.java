@@ -130,14 +130,15 @@ public class DenseLayer implements Serializable {
 
 	public Iterator<Tuple> search(Object min,Object max,boolean minEq,boolean maxEq, HashSet<Integer> pages) throws FileNotFoundException, IOException, ClassNotFoundException {
 		ArrayList<Tuple> tuples= new ArrayList<>();
-		while(pages.iterator().hasNext()){
-			String name = DenseLayerPath+indexkey +  "dense_" + pages.iterator().next()+ ".class";
+		for(Integer x : pages){
+			String name = DenseLayerPath+indexkey +  "dense_" + x+ ".class";
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(name));
 			Page page = (Page) ois.readObject();
 			for(Tuple t:page.getTuples()){
 				if(compare(t.getValues()[0],min)>=0 && compare(t.getValues()[0],max)<=0){
 					if(!((compare(t.getValues()[0],min)==0 && !minEq )|| (compare(t.getValues()[0],max)==0 && !maxEq)))
 						tuples.add(t);
+						
 				}
 			}
 			ois.close();
