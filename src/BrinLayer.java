@@ -13,9 +13,9 @@ import java.util.Date;
 
 public class BrinLayer implements Serializable {
 
-	private String indexPath, BrinLayerPath , denseLayerPath;
-	private String indexkey;
-	private int noPages;
+	public String indexPath, BrinLayerPath , denseLayerPath;
+	public String indexkey;
+	public int noPages;
 	
 	public BrinLayer(String indexPath,String indexkey) throws IOException, ClassNotFoundException, DBAppException{
 		this.indexkey=indexkey;

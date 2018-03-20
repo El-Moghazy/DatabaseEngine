@@ -13,12 +13,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 public class DenseLayer implements Serializable {
-	private String primarykey;
-	private String indexkey;
-	private String tableName,dataPath,indexPath, DenseLayerPath;
-	private Hashtable<String, String> htblColNameType;
-	private Table myTable;
-	int noPages;
+	public String primarykey;
+	public String indexkey;
+	public String tableName,dataPath,indexPath, DenseLayerPath;
+	public Hashtable<String, String> htblColNameType;
+	public Table myTable;
+	public int noPages;
 
 	public DenseLayer(String indexPath,Hashtable<String, String> htblColNameType,String indexkey,String primarykey,String dataPath,String tableName) throws IOException, ClassNotFoundException, DBAppException
 	{

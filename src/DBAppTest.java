@@ -95,11 +95,13 @@ public class DBAppTest {
 //			htblColNameValue.put("gpa", new Double(0.95));
 //			ourDB.insertIntoTable(strTableName, htblColNameValue);
 			
+			ourDB.createBRINIndex("Student", "gpa");
+			
 			Object[]objarrValues = new Object[2];
-			objarrValues[0] = new Double( 0.95 );
+			objarrValues[0] = new Double( 0.85 );
 			objarrValues[1] = new Double( 1.0 );
 			String[] strarrOperators = new String[2];
-			strarrOperators[0] = ">";
+			strarrOperators[0] = ">=";
 			strarrOperators[1] = "<";
 			Iterator resultSet = ourDB.selectFromTable(strTableName, "gpa",
 					objarrValues, strarrOperators );
@@ -155,8 +157,62 @@ public class DBAppTest {
 				input2.close();
 			}
 			input1.close();
-			
+			ArrayList<BrinIndex> b =ttt.fetchBRINindices();
+			for(BrinIndex index : b)
+			{
+				BrinLayer bi = index.fetchBrinLayer();
+				DenseLayer di = index.fetchDenseLayer();
+				
+				for(int i = 0 ; i <= bi.noPages;i++)
+				{
+					File pagFile = new File(bi.BrinLayerPath+ bi.indexkey+"brin_"+i + ".class");
+					InputStream file2 = new FileInputStream(table1);
+					InputStream buffer2 = new BufferedInputStream(file2);
+					ObjectInput input2 = new ObjectInputStream(buffer2);
+					try {
+
+						Page p = (Page) input2.readObject();
+
+						ArrayList<Tuple> t = p.getTuples();
+
+						for (Tuple tt : t) {
+							if (tt != null)
+								System.err.println(tt.toString());
+						}
+
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					input2.close();
+					
+				}
+				
+				for(int i = 0 ; i <= di.noPages;i++)
+				{
+					File pagFile = new File(di.indexPath+ di.indexkey+"dense_"+i + ".class");
+					InputStream file2 = new FileInputStream(table1);
+					InputStream buffer2 = new BufferedInputStream(file2);
+					ObjectInput input2 = new ObjectInputStream(buffer2);
+					try {
+
+						Page p = (Page) input2.readObject();
+
+						ArrayList<Tuple> t = p.getTuples();
+
+						for (Tuple tt : t) {
+							if (tt != null)
+								System.err.println(tt.toString());
+						}
+
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					input2.close();
+					
+				}
+			}
 		}
+		
 	}
 	
 
