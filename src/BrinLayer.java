@@ -116,7 +116,7 @@ public class BrinLayer implements Serializable {
 		}
 
 		public int compare(Object x,Object y){
-			switch (y.getClass().getName().toLowerCase()) {
+			switch (x.getClass().getName().toLowerCase()) {
             case "java.lang.integer":
                 return ((Integer) x).compareTo(((Integer) y));
             case "java.lang.string":

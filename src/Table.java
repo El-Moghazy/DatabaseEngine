@@ -364,7 +364,7 @@ public class Table implements Serializable {
     	{
     		if(folder.isDirectory())
     		{
-    			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
+    			File file = new File(path+folder.getName()+"/"+strColName+".class");
     			if (file.exists())
     			{
     				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
