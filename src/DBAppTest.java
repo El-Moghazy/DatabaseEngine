@@ -156,17 +156,21 @@ public class DBAppTest {
 				}
 				input2.close();
 			}
+			
+			System.err.println("__________Index__________");
 			input1.close();
 			ArrayList<BrinIndex> b =ttt.fetchBRINindices();
 			for(BrinIndex index : b)
 			{
+				System.out.println("\n"+index.getIndexColName());
 				BrinLayer bi = index.fetchBrinLayer();
 				DenseLayer di = index.fetchDenseLayer();
 				
+				System.out.println("__________Brin Layer__________");
 				for(int i = 0 ; i <= bi.noPages;i++)
 				{
 					File pagFile = new File(bi.BrinLayerPath+ bi.indexkey+"brin_"+i + ".class");
-					InputStream file2 = new FileInputStream(table1);
+					InputStream file2 = new FileInputStream(pagFile);
 					InputStream buffer2 = new BufferedInputStream(file2);
 					ObjectInput input2 = new ObjectInputStream(buffer2);
 					try {
@@ -187,10 +191,11 @@ public class DBAppTest {
 					
 				}
 				
+				System.out.println("__________Dense Layer__________");
 				for(int i = 0 ; i <= di.noPages;i++)
 				{
-					File pagFile = new File(di.indexPath+ di.indexkey+"dense_"+i + ".class");
-					InputStream file2 = new FileInputStream(table1);
+					File pagFile = new File(di.DenseLayerPath+ di.indexkey+"dense_"+i + ".class");
+					InputStream file2 = new FileInputStream(pagFile);
 					InputStream buffer2 = new BufferedInputStream(file2);
 					ObjectInput input2 = new ObjectInputStream(buffer2);
 					try {
