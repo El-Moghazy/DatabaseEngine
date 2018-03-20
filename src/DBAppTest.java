@@ -96,15 +96,15 @@ public class DBAppTest {
 //			ourDB.insertIntoTable(strTableName, htblColNameValue);
 			
 			Object[]objarrValues = new Object[2];
-			objarrValues[0] = new Double( 0.75 );
+			objarrValues[0] = new Double( 0.95 );
 			objarrValues[1] = new Double( 1.0 );
 			String[] strarrOperators = new String[2];
-			strarrOperators[0] = ">=";
+			strarrOperators[0] = ">";
 			strarrOperators[1] = "<";
 			Iterator resultSet = ourDB.selectFromTable(strTableName, "gpa",
 					objarrValues, strarrOperators );
 			while(resultSet.hasNext())
-				System.out.println(resultSet.next().toString());
+				System.err.println(resultSet.next().toString());
 
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());

@@ -384,25 +384,25 @@ public class Table implements Serializable {
         Object max;
         switch (htblColNameType.get(strColumnName).toLowerCase()) {
         case "java.lang.integer":
-            min = Integer.MIN_VALUE;
-            max = Integer.MAX_VALUE;
+            min = Integer.MAX_VALUE;
+            max = Integer.MIN_VALUE;
             break;
         case "java.lang.string":
-            min = "";
-            max = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+            min = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+            max = "";
             break;
         case "java.lang.double":
-            min = Double.MIN_VALUE;
-            max = Double.MAX_VALUE;
+            min = Double.MAX_VALUE;
+            max = Double.MIN_VALUE;
             break;
 
         case "java.util.date":
-            min = new Date(Long.MIN_VALUE);
-            max = new Date(Long.MAX_VALUE);
+            min = new Date(Long.MAX_VALUE);
+            max = new Date(Long.MIN_VALUE);
             break;
         default:
-            min = Integer.MIN_VALUE;
-            max = Integer.MAX_VALUE;
+            min = Integer.MAX_VALUE;
+            max = Integer.MIN_VALUE;
         }
 
         boolean mineq = false;
