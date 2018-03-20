@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Set;
 
 public class DBAppTest {
@@ -71,7 +72,7 @@ public class DBAppTest {
 			 ourDB.updateTable(strTableName,"78452", htblColNameValue);
 			 htblColNameValue.clear();
 			 
-			 ourDB.createBRINIndex("Student", "name");
+			
 
 			htblColNameValue.put("id", new Integer(4253455));
 			htblColNameValue.put("name", new String("Ahmed Ali"));
@@ -83,12 +84,26 @@ public class DBAppTest {
 			htblColNameValue.put("name", new String("AhmedasadNoor"));
 			htblColNameValue.put("gpa", new Double(0.95));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
+			
+			Object[]objarrValues = new Object[2];
+			objarrValues[0] = new Double( 0.75 );
+			objarrValues[1] = new Double( 2.0 );
+			String[] strarrOperators = new String[2];
+			strarrOperators[0] = ">=";
+			strarrOperators[1] = "<"; 
+			Iterator<Tuple> resultSet = ourDB.selectFromTable(strTableName, "gpa",
+					 objarrValues, strarrOperators ); 
+			while (resultSet.hasNext()) {
+				resultSet.next().toString();
+				
+			}
 
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());
 		}
 
 		TestSerialization();
+		
 
 	}
 

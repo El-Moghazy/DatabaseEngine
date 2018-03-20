@@ -99,7 +99,7 @@ public class BrinLayer implements Serializable {
 	    
 		public ArrayList<Integer> search(Object min,Object max,boolean minEq,boolean maxEq) throws FileNotFoundException, IOException, ClassNotFoundException {
 			ArrayList<Integer> pages= new ArrayList<>();
-			for(int i=0;i<noPages;i++){
+			for(int i=0;i<=noPages;i++){
 				String name=BrinLayerPath+ indexkey +  "brin_" + i + ".class";
 				ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(name));
 				Page brin = (Page) ois2.readObject();

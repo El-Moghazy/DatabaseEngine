@@ -146,10 +146,10 @@ public class DenseLayer implements Serializable {
 	}
 
 	public int compare(Object x,Object y){
-		switch (y.getClass().getName().toLowerCase()) {
-        case "java.lang.integer":
+		switch (y.getClass().getName()) {
+        case "java.lang.Integer":
             return ((Integer) x).compareTo(((Integer) y));
-        case "java.lang.string":
+        case "java.lang.String":
             return ((String) x).compareTo(((String) y));
         case "java.lang.double":
             return ((Double) x).compareTo(((Double) y));
@@ -181,8 +181,8 @@ public class DenseLayer implements Serializable {
 		while(idx < page.getTupleCount())
 		{
 			Tuple curTuple = page.getTuples().get(idx++);
-			Object c1 = tupleToDelete.get()[tupleToDelete.getKey()];
-			Object c2 = curTuple.get()[curTuple.getKey()];
+			Object c1 = tupleToDelete.get()[1];
+			Object c2 = curTuple.get()[1];
 
 			// If the current tuple equals the tuple that we want to delete
 			if(compare(c1, c2)==0)
@@ -227,8 +227,8 @@ public class DenseLayer implements Serializable {
 		colName[2] = "page.number";
 
 		Tuple newTuple = new Tuple(values, types, colName, 0);
-		if(pageNum > noPages){
-			File file = new File(DenseLayerPath + indexkey+"dense_"+ (pageNum-1) +".class");
+		if(pageNum >= noPages){
+			File file = new File(DenseLayerPath + indexkey+"dense_"+ (pageNum) +".class");
 			Page page = null;
 			if (file.exists()) {
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
@@ -239,7 +239,7 @@ public class DenseLayer implements Serializable {
 					page=createPage();
 				page.insert(newTuple, true);
 				saveindex();
-				return noPages-1;
+				return noPages;
 			}
 			for(int i=pageNum;i<=noPages;i++){
 				File file2 = new File(DenseLayerPath + indexkey+"dense_"+ i +".class");
