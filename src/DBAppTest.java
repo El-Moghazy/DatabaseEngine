@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Set;
 
 public class DBAppTest {
@@ -38,6 +39,7 @@ public class DBAppTest {
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
 			
 			htblColNameValue.clear();
+<<<<<<< HEAD
 			htblColNameValue.put("id", new Integer(2343432));
 			htblColNameValue.put("name", new String("Ahmed Noor"));
 			htblColNameValue.put("gpa", new Double(0.95));
@@ -88,12 +90,60 @@ public class DBAppTest {
 //			htblColNameValue.put("name", new String("AhmedasadNoor"));
 //			htblColNameValue.put("gpa", new Double(0.95));
 //			ourDB.insertIntoTable(strTableName, htblColNameValue);
+=======
+			htblColNameValue.put("id", new Integer(78452));
+			htblColNameValue.put("name", new String("Zaky Noor"));
+			htblColNameValue.put("gpa", new Double(0.88));
+			ourDB.insertIntoTable(strTableName, htblColNameValue);
+			 htblColNameValue.clear();
+			 htblColNameValue.put("id", new Integer(23498));
+			 htblColNameValue.put("name", new String("John Noor"));
+			 htblColNameValue.put("gpa", new Double(1.5));
+			 ourDB.deleteFromTable(strTableName, htblColNameValue);
+			 htblColNameValue.clear();
+			 htblColNameValue.put("id", new Integer(78452));
+			 htblColNameValue.put("name", new String("3ala2 Noor"));
+			 htblColNameValue.put("gpa", new Double(1.08));
+			 ourDB.updateTable(strTableName,"78452", htblColNameValue);
+			 htblColNameValue.clear();
+			 
+			
+
+			htblColNameValue.put("id", new Integer(4253455));
+			htblColNameValue.put("name", new String("Ahmed Ali"));
+			htblColNameValue.put("gpa", new Double(0.95));
+			ourDB.deleteFromTable(strTableName, htblColNameValue);
+			
+			htblColNameValue = new Hashtable();
+			htblColNameValue.put("id", new Integer(20432));
+			htblColNameValue.put("name", new String("AhmedasadNoor"));
+			htblColNameValue.put("gpa", new Double(0.95));
+			ourDB.insertIntoTable(strTableName, htblColNameValue);
+			
+			Object[]objarrValues = new Object[2];
+			objarrValues[0] = new Double( 0.75 );
+			objarrValues[1] = new Double( 2.0 );
+			String[] strarrOperators = new String[2];
+			strarrOperators[0] = ">=";
+			strarrOperators[1] = "<"; 
+			Iterator<Tuple> resultSet = ourDB.selectFromTable(strTableName, "gpa",
+					 objarrValues, strarrOperators ); 
+			while (resultSet.hasNext()) {
+				resultSet.next().toString();
+				
+			}
+>>>>>>> eedba2db30867549a8398aa435913a578448bbcd
 
 		} catch (DBAppException D) {
 			System.out.println(D.getMessage());
 		}
 
+<<<<<<< HEAD
 //		TestSerialization();
+=======
+		TestSerialization();
+		
+>>>>>>> eedba2db30867549a8398aa435913a578448bbcd
 
 	}
 

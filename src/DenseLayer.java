@@ -146,10 +146,10 @@ public class DenseLayer implements Serializable {
 	}
 
 	public int compare(Object x,Object y){
-		switch (y.getClass().getName().toLowerCase()) {
-        case "java.lang.integer":
+		switch (y.getClass().getName()) {
+        case "java.lang.Integer":
             return ((Integer) x).compareTo(((Integer) y));
-        case "java.lang.string":
+        case "java.lang.String":
             return ((String) x).compareTo(((String) y));
         case "java.lang.double":
             return ((Double) x).compareTo(((Double) y));
@@ -181,7 +181,11 @@ public class DenseLayer implements Serializable {
 		while(idx < page.getTupleCount())
 		{
 			Tuple curTuple = page.getTuples().get(idx++);
+<<<<<<< HEAD
 			Object c1 = tupleToDelete.get()[tupleToDelete.getKey()];
+=======
+			Object c1 = tupleToDelete.get()[1];
+>>>>>>> eedba2db30867549a8398aa435913a578448bbcd
 			Object c2 = curTuple.get()[1];
 
 			// If the current tuple equals the tuple that we want to delete

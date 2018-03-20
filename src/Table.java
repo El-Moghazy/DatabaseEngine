@@ -92,6 +92,7 @@ public class Table implements Serializable {
         PrimaryKeyCheck.add(value);
         fetchBRINindices();
         saveTable();
+        fetchBRINindices();
         for (BrinIndex index : indexList)
         	index.insertTuple(t,page);
         return true;
@@ -392,16 +393,20 @@ public class Table implements Serializable {
         case "java.lang.integer":
             min = Integer.MIN_VALUE;
             max = Integer.MAX_VALUE;
+            break;
         case "java.lang.string":
             min = "";
             max = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+            break;
         case "java.lang.double":
             min = Double.MIN_VALUE;
             max = Double.MAX_VALUE;
+            break;
 
         case "java.util.date":
             min = new Date(Long.MIN_VALUE);
             max = new Date(Long.MAX_VALUE);
+            break;
         default:
             min = Integer.MIN_VALUE;
             max = Integer.MAX_VALUE;
@@ -473,7 +478,7 @@ public class Table implements Serializable {
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
             while (indextuples.hasNext()) {
                 Tuple t = indextuples.next();
-                tabletubles.add(binarySearch(t.get()[t.getKey()]));  
+                tabletubles.add(binarySearch(t.get()[t.getKey()]));
             }
             return tabletubles.iterator();
 
@@ -487,7 +492,7 @@ public class Table implements Serializable {
         if (type.contains("Integer")) {
             return Math.max((Integer)max,(Integer) object);
         } else if (type.contains("Double")) {
-        	 return Math.max((Integer)max,(Integer) object);
+        	 return Math.max((Double)max,(Double) object);
 
         } else if (type.contains("String")) {
         	if(((String)max).compareTo((String)object)==1)
@@ -511,7 +516,7 @@ public class Table implements Serializable {
 	        if (type.contains("Integer")) {
 	            return Math.min((Integer)min,(Integer) object);
 	        } else if (type.contains("Double")) {
-	        	 return Math.min((Double)min,(Integer) object);
+	        	 return Math.min((Double) min,(Double) object);
 
 	        } else if (type.contains("String")) {
 	        	if(((String)min).compareTo((String)object)==-1)
