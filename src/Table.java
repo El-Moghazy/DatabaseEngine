@@ -90,11 +90,10 @@ public class Table implements Serializable {
             throw new DBAppException("Insertion in table failed. PrimaryKey value already exist in the table");
        int page= insertTuple(t);
         PrimaryKeyCheck.add(value);
-        fetchBRINindices();
         saveTable();
         fetchBRINindices();
         for (BrinIndex index : indexList)
-        	index.insertTuple(t,page);
+        	createBRINIndex(index.getIndexColName());
         return true;
 
     }
@@ -109,7 +108,7 @@ public class Table implements Serializable {
         saveTable();
         fetchBRINindices();
         for (BrinIndex index : indexList)
-        	index.deleteTuple(t);
+        	createBRINIndex(index.getIndexColName());
 
         return true;
     }
@@ -128,8 +127,7 @@ public class Table implements Serializable {
         saveTable();
         fetchBRINindices();
         for (BrinIndex index : indexList) {
-        	index.deleteTuple(old);
-        	index.insertTuple(t,pagetmp);
+        	createBRINIndex(index.getIndexColName());
         }
         return true;
     }
