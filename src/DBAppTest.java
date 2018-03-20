@@ -126,7 +126,7 @@ public class DBAppTest {
 		input.close();
 		Set<String> names = DB.getTables().keySet();
 		for (String name : names) {
-
+			System.err.println("__________Table__________");
 			File table1 = new File("databases/" + name + "/" + name + "/" + name + ".class");
 			InputStream file1 = new FileInputStream(table1);
 			InputStream buffer1 = new BufferedInputStream(file1);
