@@ -12,31 +12,35 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class DBAppTest {
-	static DBApp ourDB;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException, ParseException {
+    /**
+     * Class to test our DBApp
+     */
 
-		try {
-			String strTableName = "Student";
+    static DBApp ourDB;
 
-			ourDB = new DBApp(strTableName);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException, ParseException {
 
+        try {
+            String strTableName = "Student";
 
-			Hashtable htblColNameType = new Hashtable();
-			htblColNameType.put("id", "java.lang.Integer");
-			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("gpa", "java.lang.double");
-			ourDB.createTable(strTableName, "id", htblColNameType);
-			ourDB.createBRINIndex("Student", "id");
+            ourDB = new DBApp(strTableName);
 
 
+            Hashtable htblColNameType = new Hashtable();
+            htblColNameType.put("id", "java.lang.Integer");
+            htblColNameType.put("name", "java.lang.String");
+            htblColNameType.put("gpa", "java.lang.double");
+            ourDB.createTable(strTableName, "id", htblColNameType);
+            ourDB.createBRINIndex("Student", "id");
 
-			Hashtable htblColNameValue = new Hashtable();
-			htblColNameValue.put("id", new Integer(2343432));
-			htblColNameValue.put("name", new String("Ahmed Noor"));
-			htblColNameValue.put("gpa", new Double(0.95));
-			ourDB.insertIntoTable(strTableName, htblColNameValue);
+
+            Hashtable htblColNameValue = new Hashtable();
+            htblColNameValue.put("id", new Integer(2343432));
+            htblColNameValue.put("name", new String("Ahmed Noor"));
+            htblColNameValue.put("gpa", new Double(0.95));
+            ourDB.insertIntoTable(strTableName, htblColNameValue);
 
 //			htblColNameValue.clear();
 //			htblColNameValue.put("id", new Integer(2343432));
@@ -45,30 +49,30 @@ public class DBAppTest {
 //			ourDB.deleteFromTable(strTableName, htblColNameValue);
 
 //			ourDB.deleteFromTable(strTableName, htblColNameValue);
-			htblColNameValue.clear();
-			htblColNameValue.put("id", new Integer(4253455));
-			htblColNameValue.put("name", new String("Ahmed Ali"));
-			htblColNameValue.put("gpa", new Double(0.95));
-			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
-			htblColNameValue.clear();
-			htblColNameValue.put("id", new Integer(453455));
-			htblColNameValue.put("name", new String("Dalia Noor"));
-			htblColNameValue.put("gpa", new Double(1.25));
-			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
-			htblColNameValue.clear();
-			htblColNameValue.put("id", new Integer(23498));
-			htblColNameValue.put("name", new String("John Noor"));
-			htblColNameValue.put("gpa", new Double(1.5));
-			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
-			htblColNameValue.clear();
-			htblColNameValue.put("id", new Integer(78452));
-			htblColNameValue.put("name", new String("Zaky Noor"));
-			htblColNameValue.put("gpa", new Double(0.88));
-			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
+            htblColNameValue.clear();
+            htblColNameValue.put("id", new Integer(4253455));
+            htblColNameValue.put("name", new String("Ahmed Ali"));
+            htblColNameValue.put("gpa", new Double(0.95));
+            ourDB.insertIntoTable(strTableName, htblColNameValue);
+
+            htblColNameValue.clear();
+            htblColNameValue.put("id", new Integer(453455));
+            htblColNameValue.put("name", new String("Dalia Noor"));
+            htblColNameValue.put("gpa", new Double(1.25));
+            ourDB.insertIntoTable(strTableName, htblColNameValue);
+
+            htblColNameValue.clear();
+            htblColNameValue.put("id", new Integer(23498));
+            htblColNameValue.put("name", new String("John Noor"));
+            htblColNameValue.put("gpa", new Double(1.5));
+            ourDB.insertIntoTable(strTableName, htblColNameValue);
+
+            htblColNameValue.clear();
+            htblColNameValue.put("id", new Integer(78452));
+            htblColNameValue.put("name", new String("Zaky Noor"));
+            htblColNameValue.put("gpa", new Double(0.88));
+            ourDB.insertIntoTable(strTableName, htblColNameValue);
+
 //			 htblColNameValue.clear();
 //			 htblColNameValue.put("id", new Integer(23498));
 //			 htblColNameValue.put("name", new String("John Noor"));
@@ -94,127 +98,123 @@ public class DBAppTest {
 //			htblColNameValue.put("name", new String("AhmedasadNoor"));
 //			htblColNameValue.put("gpa", new Double(0.95));
 //			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
-			ourDB.createBRINIndex("Student", "gpa");
-			
-			Object[]objarrValues = new Object[2];
-			objarrValues[0] = new Double( 0.85 );
-			objarrValues[1] = new Double( 1.0 );
-			String[] strarrOperators = new String[2];
-			strarrOperators[0] = ">=";
-			strarrOperators[1] = "<";
-			Iterator resultSet = ourDB.selectFromTable(strTableName, "gpa",
-					objarrValues, strarrOperators );
-			while(resultSet.hasNext())
-				System.err.println(resultSet.next().toString());
 
-		} catch (DBAppException D) {
-			System.out.println(D.getMessage());
-		}
+            ourDB.createBRINIndex("Student", "gpa");
 
-		TestSerialization();
+            Object[] objarrValues = new Object[2];
+            objarrValues[0] = new Double(0.85);
+            objarrValues[1] = new Double(1.0);
+            String[] strarrOperators = new String[2];
+            strarrOperators[0] = ">=";
+            strarrOperators[1] = "<";
+            Iterator resultSet = ourDB.selectFromTable(strTableName, "gpa",
+                    objarrValues, strarrOperators);
+            while (resultSet.hasNext())
+                System.err.println(resultSet.next().toString());
 
-	}
+        } catch (DBAppException D) {
+            System.out.println(D.getMessage());
+        }
 
-	public static void TestSerialization() throws IOException, ClassNotFoundException {
-		File database = new File("databases/" + "Database"+ ".class");
-		InputStream file = new FileInputStream(database);
-		InputStream buffer = new BufferedInputStream(file);
-		ObjectInput input = new ObjectInputStream(buffer);
+        TestSerialization();
 
-		DBApp DB = (DBApp) input.readObject();
-		input.close();
-		Set<String> names = DB.getTables().keySet();
-		for (String name : names) {
+    }
 
-			File table1 = new File("databases/" + name + "/" + name + "/" + name + ".class");
-			InputStream file1 = new FileInputStream(table1);
-			InputStream buffer1 = new BufferedInputStream(file1);
-			ObjectInput input1 = new ObjectInputStream(buffer1);
+    public static void TestSerialization() throws IOException, ClassNotFoundException {
+        File database = new File("databases/" + "Database" + ".class");
+        InputStream file = new FileInputStream(database);
+        InputStream buffer = new BufferedInputStream(file);
+        ObjectInput input = new ObjectInputStream(buffer);
 
-			Table ttt = (Table) input1.readObject();
+        DBApp DB = (DBApp) input.readObject();
+        input.close();
+        Set<String> names = DB.getTables().keySet();
+        for (String name : names) {
 
-			for (int i = 0; i <= ttt.getCurPageIndex(); i++) {
-				File table = new File("databases/" + name + "/" + name + "/" + name + "_" + i + ".class");
-				System.out.println("databases/" + name + "/" + name + "/" + name + "_" + i + ".class");
-				InputStream file2 = new FileInputStream(table);
-				InputStream buffer2 = new BufferedInputStream(file2);
-				ObjectInput input2 = new ObjectInputStream(buffer2);
-				try {
+            File table1 = new File("databases/" + name + "/" + name + "/" + name + ".class");
+            InputStream file1 = new FileInputStream(table1);
+            InputStream buffer1 = new BufferedInputStream(file1);
+            ObjectInput input1 = new ObjectInputStream(buffer1);
 
-					Page p = (Page) input2.readObject();
+            Table ttt = (Table) input1.readObject();
 
-					ArrayList<Tuple> t = p.getTuples();
+            for (int i = 0; i <= ttt.getCurPageIndex(); i++) {
+                File table = new File("databases/" + name + "/" + name + "/" + name + "_" + i + ".class");
+                System.out.println("databases/" + name + "/" + name + "/" + name + "_" + i + ".class");
+                InputStream file2 = new FileInputStream(table);
+                InputStream buffer2 = new BufferedInputStream(file2);
+                ObjectInput input2 = new ObjectInputStream(buffer2);
+                try {
 
-					for (Tuple tt : t) {
-						if (tt != null)
-							System.out.println(tt.toString());
-					}
+                    Page p = (Page) input2.readObject();
 
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-				input2.close();
-			}
-			input1.close();
-			ArrayList<BrinIndex> b =ttt.fetchBRINindices();
-			for(BrinIndex index : b)
-			{
-				BrinLayer bi = index.fetchBrinLayer();
-				DenseLayer di = index.fetchDenseLayer();
-				
-				for(int i = 0 ; i <= bi.noPages;i++)
-				{
-					File pagFile = new File(bi.BrinLayerPath+ bi.indexkey+"brin_"+i + ".class");
-					InputStream file2 = new FileInputStream(table1);
-					InputStream buffer2 = new BufferedInputStream(file2);
-					ObjectInput input2 = new ObjectInputStream(buffer2);
-					try {
+                    ArrayList<Tuple> t = p.getTuples();
 
-						Page p = (Page) input2.readObject();
+                    for (Tuple tt : t) {
+                        if (tt != null)
+                            System.out.println(tt.toString());
+                    }
 
-						ArrayList<Tuple> t = p.getTuples();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                input2.close();
+            }
+            input1.close();
+            ArrayList<BrinIndex> b = ttt.fetchBRINindices();
+            for (BrinIndex index : b) {
+                BrinLayer bi = index.fetchBrinLayer();
+                DenseLayer di = index.fetchDenseLayer();
 
-						for (Tuple tt : t) {
-							if (tt != null)
-								System.err.println(tt.toString());
-						}
+                for (int i = 0; i <= bi.noPages; i++) {
+                    File pagFile = new File(bi.BrinLayerPath + bi.indexkey + "brin_" + i + ".class");
+                    InputStream file2 = new FileInputStream(table1);
+                    InputStream buffer2 = new BufferedInputStream(file2);
+                    ObjectInput input2 = new ObjectInputStream(buffer2);
+                    try {
 
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					}
-					input2.close();
-					
-				}
-				
-				for(int i = 0 ; i <= di.noPages;i++)
-				{
-					File pagFile = new File(di.indexPath+ di.indexkey+"dense_"+i + ".class");
-					InputStream file2 = new FileInputStream(table1);
-					InputStream buffer2 = new BufferedInputStream(file2);
-					ObjectInput input2 = new ObjectInputStream(buffer2);
-					try {
+                        Page p = (Page) input2.readObject();
 
-						Page p = (Page) input2.readObject();
+                        ArrayList<Tuple> t = p.getTuples();
 
-						ArrayList<Tuple> t = p.getTuples();
+                        for (Tuple tt : t) {
+                            if (tt != null)
+                                System.err.println(tt.toString());
+                        }
 
-						for (Tuple tt : t) {
-							if (tt != null)
-								System.err.println(tt.toString());
-						}
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    input2.close();
 
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					}
-					input2.close();
-					
-				}
-			}
-		}
-		
-	}
-	
+                }
+
+                for (int i = 0; i <= di.noPages; i++) {
+                    File pagFile = new File(di.indexPath + di.indexkey + "dense_" + i + ".class");
+                    InputStream file2 = new FileInputStream(table1);
+                    InputStream buffer2 = new BufferedInputStream(file2);
+                    ObjectInput input2 = new ObjectInputStream(buffer2);
+                    try {
+
+                        Page p = (Page) input2.readObject();
+
+                        ArrayList<Tuple> t = p.getTuples();
+
+                        for (Tuple tt : t) {
+                            if (tt != null)
+                                System.err.println(tt.toString());
+                        }
+
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    input2.close();
+
+                }
+            }
+        }
+
+    }
 
 
 }
