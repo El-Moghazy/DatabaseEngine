@@ -181,11 +181,7 @@ public class DenseLayer implements Serializable {
 		while(idx < page.getTupleCount())
 		{
 			Tuple curTuple = page.getTuples().get(idx++);
-<<<<<<< HEAD
-			Object c1 = tupleToDelete.get()[tupleToDelete.getKey()];
-=======
 			Object c1 = tupleToDelete.get()[1];
->>>>>>> eedba2db30867549a8398aa435913a578448bbcd
 			Object c2 = curTuple.get()[1];
 
 			// If the current tuple equals the tuple that we want to delete
