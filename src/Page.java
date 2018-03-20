@@ -25,6 +25,7 @@ public class Page implements Serializable {
     /**
      * Create a new page specifying the path at which
      * the page will be stored relative to the executable files
+     *
      * @param path the path at which the page is stored relative to the executable files
      * @throws IOException If an I/O error occurred
      */
@@ -40,11 +41,12 @@ public class Page implements Serializable {
 
     /**
      * Save & insert tuples into the page
+     *
      * @param tuple tuple to be inserted
-     * @param sort boolean if the tuples need to be sorted after the insertion
+     * @param sort  boolean if the tuples need to be sorted after the insertion
      * @return true if the tuple was inserted successfully, false otherwise
      * @throws DBAppException If an DBAppException error occurred
-     * @throws IOException If an I/O error occurred
+     * @throws IOException    If an I/O error occurred
      */
     public boolean insert(Tuple tuple, boolean sort) throws DBAppException, IOException {
 
@@ -61,10 +63,11 @@ public class Page implements Serializable {
 
     /**
      * delete tuple from the page
+     *
      * @param tuple tuple to be deleted
      * @return true if the tuple was deleted successfully, false otherwise
      * @throws DBAppException If an DBAppException error occurred
-     * @throws IOException If an I/O error occurred
+     * @throws IOException    If an I/O error occurred
      */
     public boolean delete(Tuple tuple) throws DBAppException, IOException {
         if (isEmpty())
@@ -78,6 +81,7 @@ public class Page implements Serializable {
 
     /**
      * save the page permanently on a secondary storage
+     *
      * @throws IOException If an I/O error occurred
      */
     public void savePage() throws IOException {
@@ -91,6 +95,7 @@ public class Page implements Serializable {
 
     /**
      * check if a certain key exist
+     *
      * @param objKey the search key
      * @return true if it was found, false otherwise
      */
@@ -121,6 +126,7 @@ public class Page implements Serializable {
 
     /**
      * get a certain tuple according to the search key
+     *
      * @param objKey the search key
      * @return true if it was found, false otherwise
      */
@@ -151,6 +157,7 @@ public class Page implements Serializable {
 
     /**
      * get tuples arraylist
+     *
      * @return
      */
     public ArrayList<Tuple> getTuples() {
@@ -159,6 +166,7 @@ public class Page implements Serializable {
 
     /**
      * set the page's arraylist tuples to new arraylist
+     *
      * @param tuples
      */
     public void setTuples(ArrayList<Tuple> tuples) {
@@ -167,6 +175,7 @@ public class Page implements Serializable {
 
     /**
      * get number of tuples inside the page
+     *
      * @return
      */
     public int getTupleCount() {
@@ -175,6 +184,7 @@ public class Page implements Serializable {
 
     /**
      * check if the page is full
+     *
      * @return
      */
     public boolean isFull() {
@@ -183,6 +193,7 @@ public class Page implements Serializable {
 
     /**
      * change the count of tuples inside the page
+     *
      * @param tupleCount
      */
     public void setTupleCount(int tupleCount) {
@@ -192,6 +203,7 @@ public class Page implements Serializable {
 
     /**
      * check of the page is empty
+     *
      * @return
      */
     public boolean isEmpty() {

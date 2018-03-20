@@ -21,10 +21,11 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * Creates a new tuple
-     * @param values array of values which will be in the tuple
-     * @param types  array of the types of values which will be in the tuple
+     *
+     * @param values  array of values which will be in the tuple
+     * @param types   array of the types of values which will be in the tuple
      * @param colName array of columns name in the tuple
-     * @param key Primary key in the tuple
+     * @param key     Primary key in the tuple
      */
     public Tuple(Object[] values, String[] types, String[] colName, int key) {
         this.values = values;
@@ -36,8 +37,9 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * Get the index of the given string
+     *
      * @param s string to search for it's index
-     * @return  given string index
+     * @return given string index
      */
     public int getIndex(String s) {
 
@@ -50,6 +52,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * display tuple values
+     *
      * @return
      */
     @Override
@@ -68,6 +71,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * add new value to specific index
+     *
      * @param index location for inserted value
      * @param value the object value needed to be inserted
      */
@@ -77,6 +81,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * get the tuple's values array
+     *
      * @return
      */
     public Object[] get() {
@@ -85,7 +90,8 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * check if two objects are equals
-      * @param o objects to be compared with
+     *
+     * @param o objects to be compared with
      * @return true if the are equal, false otherwise
      */
     @Override
@@ -122,6 +128,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * comparing tuples
+     *
      * @param t tuple to be compared with
      * @return
      */
@@ -171,6 +178,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * get the types of the values inside the tuple
+     *
      * @return the types of the values
      */
     public String[] getTypes() {
@@ -179,6 +187,7 @@ public class Tuple implements Serializable, Comparable<Tuple> {
 
     /**
      * get the primary key
+     *
      * @return primary key
      */
     public int getKey() {

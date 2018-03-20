@@ -27,12 +27,13 @@ public class DenseLayer implements Serializable {
 
     /**
      * Create a Dense Layer for a certain table
-     * @param indexPath path to store the dense layer
+     *
+     * @param indexPath       path to store the dense layer
      * @param htblColNameType hashtable of the names and types of the values
-     * @param indexkey the key for the current index
-     * @param primarykey primary key of the table
-     * @param dataPath the path for the data of the dense layer
-     * @param tableName table name to make the dense layer on it
+     * @param indexkey        the key for the current index
+     * @param primarykey      primary key of the table
+     * @param dataPath        the path for the data of the dense layer
+     * @param tableName       table name to make the dense layer on it
      * @throws IOException
      * @throws ClassNotFoundException
      * @throws DBAppException

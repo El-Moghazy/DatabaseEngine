@@ -27,7 +27,7 @@ public class Table implements Serializable {
 
     private Hashtable<String, String> htblColNameType;
     private String tableName, path, strClusteringKeyColumn;
-    private int curPageIndex, maxPageSize, numOfCols,pagetmp;
+    private int curPageIndex, maxPageSize, numOfCols, pagetmp;
 
     public int getCurPageIndex() {
         return curPageIndex;
@@ -61,12 +61,12 @@ public class Table implements Serializable {
 
         Object[] values = new Object[numOfCols + 1];
         String[] types = new String[numOfCols + 1];
-        String[] names=new String[numOfCols + 1];
+        String[] names = new String[numOfCols + 1];
         Set<String> columns = htblColNameValue.keySet();
         int i = 0;
         int keyIndex = numOfCols;
         for (String column : columns) {
-            names[i]=column;
+            names[i] = column;
             if (column.equals(strClusteringKeyColumn))
                 keyIndex = i;
 
@@ -76,9 +76,9 @@ public class Table implements Serializable {
         }
         Date d = Calendar.getInstance().getTime();
         values[numOfCols] = d;
-        names[numOfCols]= "insert time";
+        names[numOfCols] = "insert time";
         types[numOfCols] = "java.util.date";
-        return new Tuple(values, types, names,keyIndex);
+        return new Tuple(values, types, names, keyIndex);
     }
 
     public boolean insert(Hashtable<String, Object> htblColNameValue)
@@ -87,7 +87,7 @@ public class Table implements Serializable {
         Object value = htblColNameValue.get(strClusteringKeyColumn);
         if (PrimaryKeyCheck.contains(value))
             throw new DBAppException("Insertion in table failed. PrimaryKey value already exist in the table");
-       int page= insertTuple(t);
+        int page = insertTuple(t);
         PrimaryKeyCheck.add(value);
         saveTable();
         rollBack();
@@ -116,7 +116,7 @@ public class Table implements Serializable {
         Object oldKey = fromStringToObject(strKey, htblColNameType.get(strClusteringKeyColumn));
         if (!value.toString().equals(oldKey.toString()))
             throw new DBAppException("update in table failed. PrimaryKeys are not the same");
-       Tuple old= updateTuple(oldKey, t);
+        Tuple old = updateTuple(oldKey, t);
         PrimaryKeyCheck.add(value);
         if (PrimaryKeyCheck.contains(oldKey))
             PrimaryKeyCheck.remove(oldKey);
@@ -136,9 +136,9 @@ public class Table implements Serializable {
             if (curPage.exist(oldKey)) {
                 Tuple t = curPage.getThisTuple(oldKey);
                 curPage.delete(t);
-                curPage.insert(tuple,true);
+                curPage.insert(tuple, true);
                 ois.close();
-                  pagetmp = i;
+                pagetmp = i;
 
                 return t;
             }
@@ -174,7 +174,7 @@ public class Table implements Serializable {
                         ois2 = new ObjectInputStream(new FileInputStream(file2));
                         Page nxtPage = (Page) ois2.readObject();
                         Tuple tuple1 = nxtPage.getTuples().get(0);
-                        curPage.insert(tuple1,true);
+                        curPage.insert(tuple1, true);
                         nxtPage.delete(tuple1);
 //                      deleteTuple(tuple1);
                         if (nxtPage.getTupleCount() == 0)
@@ -202,7 +202,7 @@ public class Table implements Serializable {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
             Page curPage = (Page) ois.readObject();
             if (!curPage.isFull()) {
-                curPage.insert(tuple,true);
+                curPage.insert(tuple, true);
                 ois.close();
                 return i;
             } else {
@@ -210,7 +210,7 @@ public class Table implements Serializable {
                     Tuple t = curPage.getTuples().get(curPage.getTupleCount() - 1);
                     curPage.setTupleCount(curPage.getTupleCount() - 1);
                     curPage.getTuples().remove(t);
-                    curPage.insert(tuple,true);
+                    curPage.insert(tuple, true);
                     ois.close();
                     insertTuple(t);
 
@@ -221,7 +221,7 @@ public class Table implements Serializable {
             ois.close();
         }
         Page curPage = createPage();
-        curPage.insert(tuple,true);
+        curPage.insert(tuple, true);
         return curPageIndex;
     }
 
@@ -305,76 +305,69 @@ public class Table implements Serializable {
         oos.close();
     }
 
-    public BrinIndex getIndex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
-    {
-    	File file = new File(path+ strColName + ".class");
-		if (file.exists()) {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-			BrinIndex Index = (BrinIndex) ois.readObject();
-			ois.close();
-			return Index;
-		}
+    public BrinIndex getIndex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException {
+        File file = new File(path + strColName + ".class");
+        if (file.exists()) {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            BrinIndex Index = (BrinIndex) ois.readObject();
+            ois.close();
+            return Index;
+        }
 
-    	return null;
+        return null;
     }
 
-    public void createBRINIndex(String strColName) throws DBAppException, IOException, ClassNotFoundException
-	{
-    	if(!this.htblColNameType.containsKey(strColName))
-    		throw new DBAppException("this column does not exist");
-    	Hashtable<String, String> htblColNameType = new Hashtable<>();
-    	htblColNameType.put(strColName, this.htblColNameType.get(strColName));
-    	htblColNameType.put(strClusteringKeyColumn, this.htblColNameType.get(strClusteringKeyColumn));
+    public void createBRINIndex(String strColName) throws DBAppException, IOException, ClassNotFoundException {
+        if (!this.htblColNameType.containsKey(strColName))
+            throw new DBAppException("this column does not exist");
+        Hashtable<String, String> htblColNameType = new Hashtable<>();
+        htblColNameType.put(strColName, this.htblColNameType.get(strColName));
+        htblColNameType.put(strClusteringKeyColumn, this.htblColNameType.get(strClusteringKeyColumn));
 
-		new BrinIndex(path, htblColNameType,strColName,strClusteringKeyColumn,tableName);
-	}
-
-
-	public int getMaxPageSize() {return maxPageSize;}
-
-	/*
-	 * Returns all of the BRIN indices created on this table
-	 * */
-    public ArrayList<BrinIndex> fetchBRINindices() throws FileNotFoundException, IOException, ClassNotFoundException
-    {
-    	File dir = new File(path);
-    	ArrayList<BrinIndex> list = new ArrayList<BrinIndex>();
-    	for(File folder : dir.listFiles())
-    	{
-    		if(folder.isDirectory())
-    		{
-    			File file = new File(path+folder.getName()+"/"+folder.getName()+".class");
-    			if (file.exists())
-    			{
-    				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-    				BrinIndex index = (BrinIndex) ois.readObject();
-    				ois.close();
-    				list.add(index);
-    			}
-    		}
-    	}
-    	return indexList = list;
+        new BrinIndex(path, htblColNameType, strColName, strClusteringKeyColumn, tableName);
     }
 
-    public BrinIndex fetchBRINindex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
-    {
-    	File dir = new File(path);
-    	for(File folder : dir.listFiles())
-    	{
-    		if(folder.isDirectory())
-    		{
-    			File file = new File(path+folder.getName()+"/"+strColName+".class");
-    			if (file.exists())
-    			{
-    				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-    				BrinIndex index = (BrinIndex) ois.readObject();
-    				ois.close();
-    				return index;
-    			}
-    		}
-    	}
-    	return null;
+
+    public int getMaxPageSize() {
+        return maxPageSize;
     }
+
+    /*
+     * Returns all of the BRIN indices created on this table
+     * */
+    public ArrayList<BrinIndex> fetchBRINindices() throws FileNotFoundException, IOException, ClassNotFoundException {
+        File dir = new File(path);
+        ArrayList<BrinIndex> list = new ArrayList<BrinIndex>();
+        for (File folder : dir.listFiles()) {
+            if (folder.isDirectory()) {
+                File file = new File(path + folder.getName() + "/" + folder.getName() + ".class");
+                if (file.exists()) {
+                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                    BrinIndex index = (BrinIndex) ois.readObject();
+                    ois.close();
+                    list.add(index);
+                }
+            }
+        }
+        return indexList = list;
+    }
+
+    public BrinIndex fetchBRINindex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException {
+        File dir = new File(path);
+        for (File folder : dir.listFiles()) {
+            if (folder.isDirectory()) {
+                File file = new File(path + folder.getName() + "/" + strColName + ".class");
+                if (file.exists()) {
+                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                    BrinIndex index = (BrinIndex) ois.readObject();
+                    ois.close();
+                    return index;
+                }
+            }
+        }
+        return null;
+    }
+
     public Iterator<Tuple> search(String strColumnName, Object[] objarrValues, String[] strarrOperators)
             throws FileNotFoundException, ClassNotFoundException, IOException {
         BrinIndex index = fetchBRINindex(strColumnName);
@@ -382,48 +375,48 @@ public class Table implements Serializable {
         Object min;
         Object max;
         switch (htblColNameType.get(strColumnName).toLowerCase()) {
-        case "java.lang.integer":
-            min = Integer.MAX_VALUE;
-            max = Integer.MIN_VALUE;
-            break;
-        case "java.lang.string":
-            min = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-            max = "";
-            break;
-        case "java.lang.double":
-            min = Double.MAX_VALUE;
-            max = Double.MIN_VALUE;
-            break;
+            case "java.lang.integer":
+                min = Integer.MAX_VALUE;
+                max = Integer.MIN_VALUE;
+                break;
+            case "java.lang.string":
+                min = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+                max = "";
+                break;
+            case "java.lang.double":
+                min = Double.MAX_VALUE;
+                max = Double.MIN_VALUE;
+                break;
 
-        case "java.util.date":
-            min = new Date(Long.MAX_VALUE);
-            max = new Date(Long.MIN_VALUE);
-            break;
-        default:
-            min = Integer.MAX_VALUE;
-            max = Integer.MIN_VALUE;
+            case "java.util.date":
+                min = new Date(Long.MAX_VALUE);
+                max = new Date(Long.MIN_VALUE);
+                break;
+            default:
+                min = Integer.MAX_VALUE;
+                max = Integer.MIN_VALUE;
         }
 
         boolean mineq = false;
         boolean maxeq = false;
         for (int i = 0; i < objarrValues.length; i++) {
             switch (strarrOperators[i]) {
-            case ">=":
-                min = min(min, objarrValues[i]);
-                mineq = true;
-                break;
-            case ">":
-                min = min(min, objarrValues[i]);
-                break;
-            case "<=":
-                max = max(max, objarrValues[i]);
-                maxeq = true;
-                break;
-            case "<":
-                max = max(max, objarrValues[i]);
-                break;
-            default:
-                break;
+                case ">=":
+                    min = min(min, objarrValues[i]);
+                    mineq = true;
+                    break;
+                case ">":
+                    min = min(min, objarrValues[i]);
+                    break;
+                case "<=":
+                    max = max(max, objarrValues[i]);
+                    maxeq = true;
+                    break;
+                case "<":
+                    max = max(max, objarrValues[i]);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -448,8 +441,8 @@ public class Table implements Serializable {
                         if (tt != null) {
                             int myindex = tt.getIndex(strColumnName);
                             Object o = tt.getValues()[myindex];
-                             if(compare(o,min)>=0 && compare(o,max)<=0){
-                                if(!((compare(o,min)==0 && !mineq )|| (compare(o,max)==0 && !maxeq)))
+                            if (compare(o, min) >= 0 && compare(o, max) <= 0) {
+                                if (!((compare(o, min) == 0 && !mineq) || (compare(o, max) == 0 && !maxeq)))
                                     tabletubles.add(tt);
                             }
 
@@ -481,134 +474,125 @@ public class Table implements Serializable {
         }
     }
 
-	private Object max(Object max, Object object) {
+    private Object max(Object max, Object object) {
 
-        String type =object.getClass().toString();
+        String type = object.getClass().toString();
 
         if (type.contains("Integer")) {
-            return Math.max((Integer)max,(Integer) object);
+            return Math.max((Integer) max, (Integer) object);
         } else if (type.contains("Double")) {
-        	 return Math.max((Double)max,(Double) object);
+            return Math.max((Double) max, (Double) object);
 
         } else if (type.contains("String")) {
-        	if(((String)max).compareTo((String)object)==1)
-        		return max;
-        	else
-        		return object;
+            if (((String) max).compareTo((String) object) == 1)
+                return max;
+            else
+                return object;
         } else if (type.contains("Date")) {
-        	if(((Date)max).compareTo((Date)object)==1)
-    			return max;
-    		else
-    			return object;
+            if (((Date) max).compareTo((Date) object) == 1)
+                return max;
+            else
+                return object;
 
         }
 
-		return null;
-	}
-
-	private Object min(Object min, Object object) {
-		   String type =object.getClass().toString();
-
-	        if (type.contains("Integer")) {
-	            return Math.min((Integer)min,(Integer) object);
-	        } else if (type.contains("Double")) {
-	        	 return Math.min((Double) min,(Double) object);
-
-	        } else if (type.contains("String")) {
-	        	if(((String)min).compareTo((String)object)==-1)
-	        		return min;
-	        	else
-	        		return object;
-	        } else if (type.contains("Date")) {
-	        	if(((Date)min).compareTo((Date)object)==-1)
-	    			return min;
-	    		else
-	    			return object;
-
-	        }
-
-			return null;
-	}
-
-	private Tuple binarySearch(Object key) throws FileNotFoundException, ClassNotFoundException, IOException
-	{
-		int lo = 0 , hi = curPageIndex , index = -1;
-
-		while(lo <= hi)
-		{
-			int mid = (hi+lo)/2;
-			Page curPage = loadPage(mid);
-
-			Tuple firstTuple = curPage.getTuples().get(0);
-			Tuple lastTuple = curPage.getTuples().get(curPage.getTupleCount());
-
-			Object p1 = firstTuple.get()[firstTuple.getKey()];
-			Object p2 = lastTuple.get()[lastTuple.getKey()];
-
-			if(compare(key, p1)>=0 && compare(key, p2)<=0)
-			{
-				index = mid;
-				break;
-			}
-			if(compare(key, p2)>0)
-			{
-				lo = mid+1;
-			}
-			else
-			{
-				hi = mid-1;
-			}
-		}
-
-		if(index==-1)
-			return null;
-		return loadPage(index).getThisTuple(key);
-	}
-
-	public Page loadPage(int pageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
-	{
-		File file = new File(path + tableName+"_"+ pageNumber +".class");
-		Page page = null;
-		if (file.exists()) {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-			page= (Page) ois.readObject();
-			ois.close();
-		}
-		return page;
-	}
-
-	public int compare(Object x,Object y){
-		switch (y.getClass().getName().toLowerCase()) {
-        case "java.lang.integer":
-            return ((Integer) x).compareTo(((Integer) y));
-        case "java.lang.string":
-            return ((String) x).compareTo(((String) y));
-        case "java.lang.double":
-            return ((Double) x).compareTo(((Double) y));
-        case "java.lang.boolean":
-            return ((Boolean) x).compareTo(((Boolean) y));
-        case "java.util.date":
-            return ((Date) x).compareTo(((Date) y));
+        return null;
     }
-    return 0;
 
-	}
-	
-	public void rollBack() throws IOException, ClassNotFoundException, DBAppException
-	{
-		fetchBRINindices();
+    private Object min(Object min, Object object) {
+        String type = object.getClass().toString();
+
+        if (type.contains("Integer")) {
+            return Math.min((Integer) min, (Integer) object);
+        } else if (type.contains("Double")) {
+            return Math.min((Double) min, (Double) object);
+
+        } else if (type.contains("String")) {
+            if (((String) min).compareTo((String) object) == -1)
+                return min;
+            else
+                return object;
+        } else if (type.contains("Date")) {
+            if (((Date) min).compareTo((Date) object) == -1)
+                return min;
+            else
+                return object;
+
+        }
+
+        return null;
+    }
+
+    private Tuple binarySearch(Object key) throws FileNotFoundException, ClassNotFoundException, IOException {
+        int lo = 0, hi = curPageIndex, index = -1;
+
+        while (lo <= hi) {
+            int mid = (hi + lo) / 2;
+            Page curPage = loadPage(mid);
+
+            Tuple firstTuple = curPage.getTuples().get(0);
+            Tuple lastTuple = curPage.getTuples().get(curPage.getTupleCount());
+
+            Object p1 = firstTuple.get()[firstTuple.getKey()];
+            Object p2 = lastTuple.get()[lastTuple.getKey()];
+
+            if (compare(key, p1) >= 0 && compare(key, p2) <= 0) {
+                index = mid;
+                break;
+            }
+            if (compare(key, p2) > 0) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+
+        if (index == -1)
+            return null;
+        return loadPage(index).getThisTuple(key);
+    }
+
+    public Page loadPage(int pageNumber) throws FileNotFoundException, IOException, ClassNotFoundException {
+        File file = new File(path + tableName + "_" + pageNumber + ".class");
+        Page page = null;
+        if (file.exists()) {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            page = (Page) ois.readObject();
+            ois.close();
+        }
+        return page;
+    }
+
+    public int compare(Object x, Object y) {
+        switch (y.getClass().getName().toLowerCase()) {
+            case "java.lang.integer":
+                return ((Integer) x).compareTo(((Integer) y));
+            case "java.lang.string":
+                return ((String) x).compareTo(((String) y));
+            case "java.lang.double":
+                return ((Double) x).compareTo(((Double) y));
+            case "java.lang.boolean":
+                return ((Boolean) x).compareTo(((Boolean) y));
+            case "java.util.date":
+                return ((Date) x).compareTo(((Date) y));
+        }
+        return 0;
+
+    }
+
+    public void rollBack() throws IOException, ClassNotFoundException, DBAppException {
+        fetchBRINindices();
         ArrayList<String> indexedColNames = new ArrayList<String>();
-        
-        for (BrinIndex index : indexList)
-        {
+
+        for (BrinIndex index : indexList) {
 //        	index.insertTuple(t,page);
-        	indexedColNames.add(index.getIndexColName());
+            indexedColNames.add(index.getIndexColName());
 //        	createBRINIndex(index.getIndexColName());
-        	index.drop();
+            index.drop();
         }
         indexList = new ArrayList<BrinIndex>();
-        for(String col : indexedColNames)
-        	createBRINIndex(col);
+        for (String col : indexedColNames)
+            createBRINIndex(col);
 
-	}
+    }
 }
