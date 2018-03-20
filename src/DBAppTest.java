@@ -12,6 +12,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class DBAppTest {
+
+	/**
+	 * Class to test our DBApp
+	 */
+	 
 	static DBApp ourDB;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -50,31 +55,31 @@ public class DBAppTest {
 			htblColNameValue.put("name", new String("Ahmed Ali"));
 			htblColNameValue.put("gpa", new Double(0.95));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
+
 			htblColNameValue.clear();
 			htblColNameValue.put("id", new Integer(453455));
 			htblColNameValue.put("name", new String("Dalia Noor"));
 			htblColNameValue.put("gpa", new Double(1.25));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
+
 			htblColNameValue.clear();
 			htblColNameValue.put("id", new Integer(23498));
 			htblColNameValue.put("name", new String("John Noor"));
 			htblColNameValue.put("gpa", new Double(1.5));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
+
 			htblColNameValue.clear();
 			htblColNameValue.put("id", new Integer(78452));
 			htblColNameValue.put("name", new String("Zaky Noor"));
 			htblColNameValue.put("gpa", new Double(0.88));
 			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
+
 //			 htblColNameValue.clear();
 //			 htblColNameValue.put("id", new Integer(23498));
 //			 htblColNameValue.put("name", new String("John Noor"));
 //			 htblColNameValue.put("gpa", new Double(1.5));
 //			 ourDB.deleteFromTable(strTableName, htblColNameValue);
-//			 
+//
 //			 htblColNameValue.clear();
 //			 htblColNameValue.put("id", new Integer(78452));
 //			 htblColNameValue.put("name", new String("3ala2 Noor"));
@@ -94,9 +99,9 @@ public class DBAppTest {
 //			htblColNameValue.put("name", new String("AhmedasadNoor"));
 //			htblColNameValue.put("gpa", new Double(0.95));
 //			ourDB.insertIntoTable(strTableName, htblColNameValue);
-			
+
 			ourDB.createBRINIndex("Student", "gpa");
-			
+
 			Object[]objarrValues = new Object[2];
 			objarrValues[0] = new Double( 0.85 );
 			objarrValues[1] = new Double( 1.0 );
@@ -157,7 +162,7 @@ public class DBAppTest {
 				}
 				input2.close();
 			}
-			
+
 			System.err.println("__________Index__________");
 			input1.close();
 			ArrayList<BrinIndex> b =ttt.fetchBRINindices();
@@ -166,7 +171,7 @@ public class DBAppTest {
 				System.out.println("\n"+index.getIndexColName());
 				BrinLayer bi = index.fetchBrinLayer();
 				DenseLayer di = index.fetchDenseLayer();
-				
+
 				System.out.println("__________Brin Layer__________");
 				for(int i = 0 ; i <= bi.noPages;i++)
 				{
@@ -189,9 +194,9 @@ public class DBAppTest {
 						e.printStackTrace();
 					}
 					input2.close();
-					
+
 				}
-				
+
 				System.out.println("__________Dense Layer__________");
 				for(int i = 0 ; i <= di.noPages;i++)
 				{
@@ -214,13 +219,13 @@ public class DBAppTest {
 						e.printStackTrace();
 					}
 					input2.close();
-					
+
 				}
 			}
 		}
-		
+
 	}
-	
+
 
 
 }

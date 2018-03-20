@@ -9,12 +9,26 @@ import java.util.Date;
 
 public class Page implements Serializable {
 
+	/**
+     * A page is part of a table holding its tuples.
+     * Tables are stored in many pages in a binary
+     * file format (.class files)
+     */
+
 	private static final long serialVersionUID = 1L;
 
 	private int maximumSize, tupleCount;
 	private String path;
 	private ArrayList<Tuple> tuples;
 
+
+	/**
+	     * Create a new page specifying the path at which
+	     * the page will be stored relative to the executable files
+	     *
+	     * @param path the path at which the page is stored relative to the executable files
+	     * @throws IOException If an I/O error occurred
+	     */
 	public Page(String path) throws IOException {
 		Configuration config = new Configuration();
 		this.maximumSize = config.getMaximumSize();
@@ -25,7 +39,15 @@ public class Page implements Serializable {
 		savePage();
 	}
 
-	// TODO:
+	/**
+     * Save & insert tuples into the page
+     *
+     * @param tuple tuple to be inserted
+     * @param sort  boolean if the tuples need to be sorted after the insertion
+     * @return true if the tuple was inserted successfully, false otherwise
+     * @throws DBAppException If an DBAppException error occurred
+     * @throws IOException    If an I/O error occurred
+     */
 	public boolean insert(Tuple tuple,boolean sort) throws DBAppException, IOException {
 
 		if (isFull()) {
@@ -38,6 +60,15 @@ public class Page implements Serializable {
 		savePage();
 		return true;
 	}
+
+	/**
+     * delete tuple from the page
+     *
+     * @param tuple tuple to be deleted
+     * @return true if the tuple was deleted successfully, false otherwise
+     * @throws DBAppException If an DBAppException error occurred
+     * @throws IOException    If an I/O error occurred
+     */
 	public boolean delete(Tuple tuple) throws DBAppException, IOException {
 		if(isEmpty())
 			return false;
@@ -48,6 +79,11 @@ public class Page implements Serializable {
 
 	}
 
+	/**
+     * save the page permanently on a secondary storage
+     *
+     * @throws IOException If an I/O error occurred
+     */
 	public void savePage() throws IOException {
 		File file = new File(path);
 		if (!file.exists())
@@ -82,6 +118,12 @@ public class Page implements Serializable {
 		return tupleCount==0;
 	}
 
+	/**
+	     * check if a certain key exist
+	     *
+	     * @param objKey the search key
+	     * @return true if it was found, false otherwise
+	     */
 	public boolean exist(Object objKey) {
 		for(Tuple t : tuples){
 			t.get()[t.getKey()].equals(objKey);
@@ -107,6 +149,12 @@ public class Page implements Serializable {
 		return false;
 	}
 
+	/**
+     * get a certain tuple according to the search key
+     *
+     * @param objKey the search key
+     * @return true if it was found, false otherwise
+     */
 	public Tuple getThisTuple(Object objKey) {
 		for(Tuple t : tuples){
 			t.get()[t.getKey()].equals(objKey);

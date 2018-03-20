@@ -30,9 +30,15 @@ public class Table implements Serializable {
     private String tableName, path, strClusteringKeyColumn;
     private int curPageIndex, maxPageSize, numOfCols,pagetmp;
 
+    /**
+       * Get the index of the current page
+       *
+       * @return
+       */
     public int getCurPageIndex() {
         return curPageIndex;
     }
+
 
     public Table(String tableName, String path, Hashtable<String, String> htblColNameType,
                  String strClusteringKeyColumn) throws DBAppException, IOException {
@@ -52,6 +58,13 @@ public class Table implements Serializable {
 
     }
 
+    /**
+         * Returns a new Tuple using the values of columns specified in the hashtable passed to the function
+         *
+         * @param htblColNameValue hashtable containing the values to be inserted
+         * @return
+         * @throws DBAppException
+         */
     private Tuple makeTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
         checkInsertedColumns(htblColNameValue);
 
@@ -82,6 +95,17 @@ public class Table implements Serializable {
         return new Tuple(values, types, names,keyIndex);
     }
 
+    /**
+       * Inserts a new tuple using the values specified by the hachtable and the tuple returnes by
+       * passing the values to the function {@code maketuple}. Returns True if the value was inserted correctly
+       * and false otherwise
+       *
+       * @param htblColNameValue the hashtable containing that would be inserted
+       * @return
+       * @throws DBAppException
+       * @throws ClassNotFoundException
+       * @throws IOException
+       */
     public boolean insert(Hashtable<String, Object> htblColNameValue)
             throws DBAppException, ClassNotFoundException, IOException {
         Tuple t = makeTuple(htblColNameValue);
@@ -98,6 +122,17 @@ public class Table implements Serializable {
 
     }
 
+    /**
+         * Deletes a Tuple with values specified by the
+         * parameter hashtable and Returns True if the
+         * deletion was successful
+         *
+         * @param htblColNameValue Hashtable containing the values to be deleted
+         * @return
+         * @throws DBAppException
+         * @throws ClassNotFoundException
+         * @throws IOException
+         */
     public boolean delete(Hashtable<String, Object> htblColNameValue)
             throws DBAppException, ClassNotFoundException, IOException {
         Tuple t = makeTuple(htblColNameValue);
@@ -112,6 +147,17 @@ public class Table implements Serializable {
         return true;
     }
 
+    /**
+         * Updates the Tuple by using its Key specified in the parameters and the values from the hashtable
+         *
+         * @param strKey           The datatypes for all the variables in the tuple
+         * @param htblColNameValue The updated values
+         * @return
+         * @throws DBAppException
+         * @throws IOException
+         * @throws ClassNotFoundException
+         * @throws ParseException
+         */
     public boolean update(String strKey, Hashtable<String, Object> htblColNameValue)
             throws DBAppException, IOException, ClassNotFoundException, ParseException {
         Tuple t = makeTuple(htblColNameValue);
@@ -130,6 +176,19 @@ public class Table implements Serializable {
         return true;
     }
 
+    /**
+         * Updates the values of a specific Tuple using the values to be replaced
+         * by deleting the old Tuple and inserting a new one in its place using the nes
+         * values specified
+         *
+         * @param oldKey The old value identifying in the tuple to be updated
+         * @param tuple  The new tuple to be inserted with all the updated values
+         * @return
+         * @throws FileNotFoundException
+         * @throws IOException
+         * @throws ClassNotFoundException
+         * @throws DBAppException
+         */
     private Tuple updateTuple(Object oldKey, Tuple tuple)
             throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException {
         for (int i = 0; i <= curPageIndex; i++) {
@@ -152,10 +211,24 @@ public class Table implements Serializable {
 
     }
 
+    /**
+         * Returns the Clustring key of the table
+         *
+         * @return
+         */
     public String getStrClusteringKeyColumn() {
         return strClusteringKeyColumn;
     }
 
+    /**
+         * Delets a specific tuple passed as a parameter to the function by matching it with
+         * the tuples in the table
+         *
+         * @param tuple Tuple to be deleted
+         * @throws IOException
+         * @throws DBAppException
+         * @throws ClassNotFoundException
+         */
     private void deleteTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
         for (int i = 0; i <= curPageIndex; i++) {
             File file = new File(path + tableName + "_" + i + ".class");
@@ -199,6 +272,15 @@ public class Table implements Serializable {
         throw new DBAppException("This row does not exist in the table");
     }
 
+    /**
+         * Inserts a new Tuple in the table using the specified tuple
+         *
+         * @param tuple Tuple to be inserted
+         * @return
+         * @throws IOException
+         * @throws DBAppException
+         * @throws ClassNotFoundException
+         */
     public int insertTuple(Tuple tuple) throws IOException, DBAppException, ClassNotFoundException {
 
         for (int i = 0; i <= curPageIndex; i++) {
@@ -229,6 +311,12 @@ public class Table implements Serializable {
         return curPageIndex;
     }
 
+    /**
+         * Checks if the inserted values matche the type of the columns or not
+         *
+         * @param htblColNameValue Values to be checked
+         * @throws DBAppException
+         */
     private void checkInsertedColumns(Hashtable<String, Object> htblColNameValue) throws DBAppException {
         for (Entry<String, Object> entry : htblColNameValue.entrySet()) {
             String colName = entry.getKey();
@@ -239,6 +327,14 @@ public class Table implements Serializable {
         }
     }
 
+    /**
+         * Checks the type of the object specified
+         * Could use getClass.getName() instead
+         *
+         * @param value object to be checked
+         * @param type  Type to be matched
+         * @return
+         */
     public boolean checkValueType(Object value, String type) {
 
         switch (type.toLowerCase()) {
@@ -262,6 +358,15 @@ public class Table implements Serializable {
         }
     }
 
+    /**
+         * Converting {@code String} to an object
+         *
+         * @param strKey {@code String} to be converted to {@code Object}
+         * @param type   Type of Object
+         * @return
+         * @throws ParseException
+         * @throws DBAppException
+         */
     private Object fromStringToObject(String strKey, String type) throws ParseException, DBAppException {
         Object key = new Object();
         try {
@@ -289,17 +394,31 @@ public class Table implements Serializable {
         }
     }
 
+    /**
+       * Creates a new Directory in the file path
+       */
     private void createTableDirectory() {
         File table = new File(path);
         table.mkdir();
     }
 
+    /**
+         * Returns a new pages after creating it in the specific folder specified by the path
+         *
+         * @return
+         * @throws IOException
+         */
     private Page createPage() throws IOException {
         Page page = new Page(path + tableName + "_" + (++curPageIndex) + ".class");
         saveTable();
         return page;
     }
 
+    /**
+       * Saves the Table to the Disk in the specific path for that
+       *
+       * @throws IOException
+       */
     private void saveTable() throws IOException {
         File table = new File(path + tableName + ".class");
         if (!table.exists())
@@ -309,6 +428,15 @@ public class Table implements Serializable {
         oos.close();
     }
 
+    /**
+         * Returns the Brin Index saved for this specific column
+         *
+         * @param strColName The column name that identifies its Brin index path
+         * @return
+         * @throws FileNotFoundException
+         * @throws IOException
+         * @throws ClassNotFoundException
+         */
     public BrinIndex getIndex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File file = new File(path+ strColName + ".class");
@@ -322,6 +450,14 @@ public class Table implements Serializable {
     	return null;
     }
 
+    /**
+       * Creates a new Brin index for the specified column
+       *
+       * @param strColName The column that the Brin index will be applied to
+       * @throws DBAppException
+       * @throws IOException
+       * @throws ClassNotFoundException
+       */
     public void createBRINIndex(String strColName) throws DBAppException, IOException, ClassNotFoundException
 	{
     	if(!this.htblColNameType.containsKey(strColName))
@@ -334,11 +470,24 @@ public class Table implements Serializable {
 	}
 
 
+  /**
+     * Returns the maximum size of the page
+     *
+     * @return
+     */
 	public int getMaxPageSize() {return maxPageSize;}
 
-	/*
-	 * Returns all of the BRIN indices created on this table
-	 * */
+  /**
+     * Fetches the brin indices from the directory
+     *
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    /*
+     * Returns all of the BRIN indices created on this table
+     * */
     public ArrayList<BrinIndex> fetchBRINindices() throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File dir = new File(path);
@@ -360,6 +509,15 @@ public class Table implements Serializable {
     	return indexList = list;
     }
 
+    /**
+     * Returns the Brin index for specified column if it was stored before
+     *
+     * @param strColName The Column name that the index was applied to
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public BrinIndex fetchBRINindex(String strColName) throws FileNotFoundException, IOException, ClassNotFoundException
     {
     	File dir = new File(path);
@@ -379,9 +537,22 @@ public class Table implements Serializable {
     	}
     	return null;
     }
+
+    /**
+   * Returns the matching tuples after Searching for an object using
+   * Brin index
+   *
+   * @param strColumnName   The name of the column that the Brin index was applid to
+   * @param objarrValues    values to be used in the search
+   * @param strarrOperators Operators to be used in search for comparing the values
+   * @return
+   * @throws FileNotFoundException
+   * @throws ClassNotFoundException
+   * @throws IOException
+   */
     public Iterator<Tuple> search(String strColumnName, Object[] objarrValues, String[] strarrOperators)
             throws FileNotFoundException, ClassNotFoundException, IOException {
-       
+
 
         Object min;
         Object max;
@@ -466,7 +637,7 @@ public class Table implements Serializable {
 
             return tabletubles.iterator();
 
-        
+
 
     /*        Iterator<Tuple> indextuples = index.search(min, max, mineq, maxeq);
             ArrayList<Tuple> tabletubles = new ArrayList<Tuple>();
@@ -484,6 +655,13 @@ public class Table implements Serializable {
         */
     }
 
+    /**
+         * Returns the Maximum value among two objects
+         *
+         * @param max    Value to be compared
+         * @param object Vlaue to be compared
+         * @return
+         */
 	private Object max(Object max, Object object) {
 
         String type =object.getClass().toString();
@@ -509,6 +687,13 @@ public class Table implements Serializable {
 		return null;
 	}
 
+  /**
+       * Returns the minumum value among two {@code Object} values
+       *
+       * @param min    Value to be compared
+       * @param object Value to be compared
+       * @return
+       */
 	private Object min(Object min, Object object) {
 		   String type =object.getClass().toString();
 
@@ -533,6 +718,15 @@ public class Table implements Serializable {
 			return null;
 	}
 
+  /**
+     * Performing a binary search in  a page using a specific object
+     *
+     * @param key Value to be searched for
+     * @return
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
 	private Tuple binarySearch(Object key) throws FileNotFoundException, ClassNotFoundException, IOException
 	{
 		int lo = 0 , hi = curPageIndex , index = -1;
@@ -568,6 +762,15 @@ public class Table implements Serializable {
 		return loadPage(index).getThisTuple(key);
 	}
 
+  /**
+     * Returns a page using its Number that identifies its path
+     *
+     * @param pageNumber The Number of the Page you want to load
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
 	public Page loadPage(int pageNumber) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		File file = new File(path + tableName+"_"+ pageNumber +".class");
@@ -580,6 +783,13 @@ public class Table implements Serializable {
 		return page;
 	}
 
+  /**
+       * Compares two objects
+       *
+       * @param x Object to be compared
+       * @param y Object to be compared
+       * @return
+       */
 	public int compare(Object x,Object y){
 		switch (y.getClass().getName().toLowerCase()) {
         case "java.lang.integer":
@@ -596,12 +806,12 @@ public class Table implements Serializable {
     return 0;
 
 	}
-	
+
 	public void rollBack() throws IOException, ClassNotFoundException, DBAppException
 	{
 		fetchBRINindices();
         ArrayList<String> indexedColNames = new ArrayList<String>();
-        
+
         for (BrinIndex index : indexList)
         {
 //        	index.insertTuple(t,page);

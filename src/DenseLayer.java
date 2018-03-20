@@ -14,6 +14,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 public class DenseLayer implements Serializable {
+
+	/**
+	 * Dense Layer that store the sorted values of the pages and point to them
+	 */
 	public String primarykey;
 	public String indexkey;
 	public String tableName,dataPath,indexPath, DenseLayerPath;
@@ -21,6 +25,19 @@ public class DenseLayer implements Serializable {
 	public Table myTable;
 	public int noPages;
 
+	/**
+     * Create a Dense Layer for a certain table
+     *
+     * @param indexPath       path to store the dense layer
+     * @param htblColNameType hashtable of the names and types of the values
+     * @param indexkey        the key for the current index
+     * @param primarykey      primary key of the table
+     * @param dataPath        the path for the data of the dense layer
+     * @param tableName       table name to make the dense layer on it
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws DBAppException
+     */
 	public DenseLayer(String indexPath,Hashtable<String, String> htblColNameType,String indexkey,String primarykey,String dataPath,String tableName) throws IOException, ClassNotFoundException, DBAppException
 	{
 		this.primarykey=primarykey;
@@ -45,18 +62,25 @@ public class DenseLayer implements Serializable {
 		saveindex();
 	}
 
+	/**
+	     * make directory for the dense layer
+	     */
 	private void createTDenseDirectory()
 	{
 		File dense = new File(DenseLayerPath);
 		dense.mkdir();
 	}
 
-	/*
-	 *	Loads the data from the table
-	 * 	Sorts the data by the indexed column
-	 * 	Stores the data in the dense layer
+	/**
+	 * Loads the data from the table
+	 * Sorts the data by the indexed column
+	 * Stores the data in the dense layer
 	 *
-	 * */
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws DBAppException
+	 */
 	public void load() throws FileNotFoundException, IOException, ClassNotFoundException, DBAppException
 	{
 		ArrayList<Tuple> data = new ArrayList<Tuple>();
@@ -112,6 +136,12 @@ public class DenseLayer implements Serializable {
 		curPage.savePage();
 	}
 
+	/**
+	     * Create new Dense Layer Page
+	     *
+	     * @return
+	     * @throws IOException if an I/O error occur
+	     */
     private Page createPage() throws IOException {
 
     	Page page = new Page(DenseLayerPath+indexkey +  "dense_" + (++noPages) + ".class");
@@ -119,6 +149,11 @@ public class DenseLayer implements Serializable {
         return page;
     }
 
+		/**
+		     * saving the index file in the secondary storage
+		     *
+		     * @throws IOException if an I/O error occur
+		     */
     private void saveindex() throws IOException {
         File dense = new File(DenseLayerPath + "DenseLayer" + ".class");
         if (!dense.exists())
@@ -138,7 +173,7 @@ public class DenseLayer implements Serializable {
 				if(compare(t.getValues()[0],min)>=0 && compare(t.getValues()[0],max)<=0){
 					if(!((compare(t.getValues()[0],min)==0 && !minEq )|| (compare(t.getValues()[0],max)==0 && !maxEq)))
 						tuples.add(t);
-						
+
 				}
 			}
 			ois.close();
@@ -284,15 +319,15 @@ public class DenseLayer implements Serializable {
 		}
 		return page;
 	}
-	
+
 	public void drop() throws IOException
 	{
 		File dir = new File(DenseLayerPath);
 		for(File file : dir.listFiles())
 			file.delete();
-		
+
 	}
 
-	
+
 
 }

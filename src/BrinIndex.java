@@ -13,14 +13,30 @@ import java.util.Iterator;
 
 
 public class BrinIndex implements Serializable{
-	
+
+	/**
+     * BRIN Index that store the max and min of each page
+     * to make the Database Engine Operation faster and easier
+     */
+
 	private String indexPath, dataPath , tableName , indexColName;
 	private transient DenseLayer denseLayer;
 	private transient BrinLayer brinLayer;
-	
-	// Constructor
+
+	/**
+	     * Constructor that creates the BRIN index for a given table
+	     *
+	     * @param dataPath        path of the data stored
+	     * @param htblColNameType names and types of values in the table
+	     * @param indexkey        index key of the table
+	     * @param primarykey      primary key of the table
+	     * @param tableName       name of table
+	     * @throws IOException
+	     * @throws ClassNotFoundException
+	     * @throws DBAppException
+	     */
 	public BrinIndex(String dataPath,Hashtable<String, String> htblColNameType,String indexkey,String primarykey,String tableName) throws IOException, ClassNotFoundException, DBAppException
-	{	
+	{
 		this.dataPath=dataPath;
 		indexPath = dataPath+indexkey+'/';
 		this.tableName = tableName;
@@ -32,27 +48,61 @@ public class BrinIndex implements Serializable{
 		save();
 
 	}
-	
-	// 
+
+	/**
+	 * Create Dense Layer for the BRIN Index
+	 *
+	 * @param indexPath       path of the index
+	 * @param htblColNameType names and types of values in the table
+	 * @param indexkey        index key of the table
+	 * @param primarykey      primary key of the table
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws DBAppException
+	 */
 	public void createDenseIndex(String indexPath,Hashtable<String, String> htblColNameType,String indexkey,String primarykey) throws IOException, ClassNotFoundException, DBAppException
 	{
 		denseLayer=new DenseLayer(indexPath, htblColNameType, indexkey, primarykey,dataPath,tableName);
 	}
-	
+
+	/**
+	     * Create BRIN Layer for the BRIN Index
+	     *
+	     * @param indexkey index key of the table
+	     * @throws IOException
+	     * @throws ClassNotFoundException
+	     * @throws DBAppException
+	     */
 	public void createBrinIndex(String indexkey) throws IOException, ClassNotFoundException, DBAppException
 	{
 		brinLayer = new BrinLayer(indexPath,indexkey);
 	}
-	
+
+	/**
+	     * Create Directory for the BRIN Index
+	     */
 	private void createTIndexDirectory() {
         File brin = new File(indexPath);
         brin.mkdir();
     }
 
+		/**
+		     * Get the Indexed Column name
+		     *
+		     * @return
+		     */
 	public String getIndexColName() {
 		return indexColName;
 	}
-	
+
+	/**
+	     * Fetch the dense layer class and assign it to denseLayer variable
+	     *
+	     * @return
+	     * @throws FileNotFoundException
+	     * @throws IOException
+	     * @throws ClassNotFoundException
+	     */
 	public DenseLayer fetchDenseLayer() throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		File file = new File(indexPath + "DenseLayer/DenseLayer.class");
@@ -64,7 +114,15 @@ public class BrinIndex implements Serializable{
 		}
 		return null;
 	}
-	
+
+	/**
+	     * Fetch the BRIN Layer Class and assign it to brinLayer variable
+	     *
+	     * @return
+	     * @throws FileNotFoundException
+	     * @throws IOException
+	     * @throws ClassNotFoundException
+	     */
 	public BrinLayer fetchBrinLayer() throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		File file = new File(indexPath + "BrinLayer/BrinLayer.class");
@@ -76,7 +134,12 @@ public class BrinIndex implements Serializable{
 		}
 		return null;
 	}
-	
+
+	/**
+     * Save the BRIN Index into .class files
+     *
+     * @throws IOException
+     */
 	public void save() throws IOException
 	{
 		File index = new File(indexPath + indexColName + ".class");
@@ -90,9 +153,9 @@ public class BrinIndex implements Serializable{
 		fetchBrinLayer();
 		fetchDenseLayer();
 			HashSet<Integer> pages=brinLayer.search(min,max,minEq,maxEq);
-		
+
 		return denseLayer.search(min,max,minEq,maxEq,pages);
-		
+
 	}
 
 	public void deleteTuple(Tuple tupleToDelete) throws FileNotFoundException, ClassNotFoundException, IOException, DBAppException
@@ -109,7 +172,7 @@ public class BrinIndex implements Serializable{
 			return;
 		}
 		int pageNumber = list.iterator().next();
-		
+
 		denseLayer.delete(tupleToDelete, pageNumber);
 		brinLayer.refresh(pageNumber,denseLayer.noPages);
 	}
@@ -128,7 +191,7 @@ public class BrinIndex implements Serializable{
 		page=denseLayer.insert(t, page,pagetable);
 		brinLayer.refresh(page,denseLayer.noPages);
 	}
-	
+
 	public void drop() throws IOException, ClassNotFoundException
 	{
 		fetchBrinLayer();
@@ -138,7 +201,7 @@ public class BrinIndex implements Serializable{
 		File dir = new File(indexPath);
 		for(File file : dir.listFiles())
 			file.delete();
-		
+
 	}
 
 }
